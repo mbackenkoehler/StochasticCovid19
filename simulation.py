@@ -105,7 +105,7 @@ def simulation_run(G, model, time_point_samples, at_leat_one=False, max_steps=No
 
 
 
-def simulate(G, model, time_point_samples, num_runs=500, outpath = 'simu_out_oo.pdf', max_steps=None):
+def simulate(G, model, time_point_samples, num_runs=100, outpath = 'output.pdf', max_steps=None):
     G = nx.convert_node_labels_to_integers(G)
     init_node_state = model.get_init_labeling(G)
 
@@ -121,6 +121,10 @@ def simulate(G, model, time_point_samples, num_runs=500, outpath = 'simu_out_oo.
     for run_i in range(num_runs):
         G_run_i = copy.deepcopy(G) # to not overwrite
         node_state_counts = simulation_run(G_run_i, model, time_point_samples, at_leat_one=False, max_steps=max_steps)
+        try:
+            node_state_counts = model.aggregate(node_state_counts)
+        except:
+            pass
         print('.', end='')
         for x_i, time_point in enumerate(time_point_samples):
             for node_state, fractions in node_state_counts.items():
@@ -145,5 +149,6 @@ if __name__ == "__main__":
     cv = get_critical_value(G)
     sis_model = SISmodel(infection_rate=cv*3)
     sir_model = SIRmodel(infection_rate=cv * 7)
-    time_point_samples =  np.linspace(0,5,50)
-    simulate(G, sir_model, time_point_samples)
+    corona_model = Corona()
+    time_point_samples =  np.linspace(0,50,100)
+    simulate(G, corona_model, time_point_samples)
