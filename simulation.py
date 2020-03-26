@@ -22,98 +22,7 @@ import copy
 # Config
 #
 
-# model has to have states(), get_init_labeling(), and next_event(self, G, src_node, global_clock) method
-class SISmodel:
-    def __init__(self, infection_rate):
-        self.infection_rate = infection_rate
-
-    def states(self):
-        return ['I', 'S']
-
-    def get_init_labeling(self):
-        init_node_state = {n: ('I' if random.random() > 0.9 else 'S') for n in range(G.number_of_nodes())}
-        return init_node_state
-
-    def next_event(self, G, src_node, global_clock):
-        event_id = G.nodes[src_node]['event_id']
-        event_id += 1
-
-        if G.nodes[src_node]['state'] == 'I':
-            new_state = 'S'
-            fire_time = -np.log(random.random())  # recov-rate is alsways 1
-        else:
-            new_state = 'I'
-            inf_neighbors = len([n for n in G.neighbors(src_node) if G.nodes[n]['state'] == 'I'])
-            if inf_neighbors == 0:
-                fire_time = 10000000 + random.random()
-            else:
-                node_rate = inf_neighbors * self.infection_rate
-                fire_time = -np.log(random.random()) / node_rate
-
-        G.nodes[src_node]['event_id'] = event_id
-        new_time = global_clock + fire_time
-        return new_time, src_node, new_state, event_id
-
-
-class SIRmodel:
-    def __init__(self, infection_rate):
-        self.infection_rate = infection_rate
-
-    def states(self):
-        return ['I', 'S', 'R']
-
-    def get_init_labeling(self):
-        init_node_state = {n: ('I' if random.random() > 0.9 else 'S') for n in range(G.number_of_nodes())}
-        return init_node_state
-
-    def next_event(self, G, src_node, global_clock):
-        event_id = G.nodes[src_node]['event_id']
-        event_id += 1
-
-        if G.nodes[src_node]['state'] == 'I':
-            new_state = 'R'
-            fire_time = -np.log(random.random())
-        elif G.nodes[src_node]['state'] == 'S':
-            new_state = 'I'
-            inf_neighbors = len([n for n in G.neighbors(src_node) if G.nodes[n]['state'] == 'I'])
-            if inf_neighbors == 0:
-                fire_time = 10000000 + random.random()
-            else:
-                node_rate = inf_neighbors * self.infection_rate
-                fire_time = -np.log(random.random()) / node_rate
-        else:
-            new_state = 'R'
-            fire_time = 10000000 + random.random()
-
-        G.nodes[src_node]['event_id'] = event_id
-        new_time = global_clock + fire_time
-        return new_time, src_node, new_state, event_id
-
-
-#NODE_STATES = ['I', 'S']
-
-# the next event function specifies the model dynamics
-#def next_event(G, inf_rate, src_node, global_clock):
-#    event_id = G.nodes[src_node]['event_id']
-#    event_id += 1##
-
- #   if  G.nodes[src_node]['state'] == 'I':
- #       new_state = 'S'
- #       fire_time = -np.log(random.random()) # recov-rate is alsways 1
- #   else:
- #       new_state = 'I'
- #       inf_neighbors = len([n for n in G.neighbors(src_node) if G.nodes[n]['state'] == 'I'])
- #       if inf_neighbors == 0:
- #           fire_time = 10000000 + random.random()
- #       else:
- #           node_rate = inf_neighbors * inf_rate
- #           fire_time = -np.log(random.random()) / node_rate
-
-
-#    G.nodes[src_node]['event_id'] = event_id
-#    new_time = global_clock + fire_time
-#    return new_time, src_node, new_state, event_id
-
+from spreading_models import *
 
 
 #
@@ -198,7 +107,7 @@ def simulation_run(G, model, time_point_samples, at_leat_one=False, max_steps=No
 
 def simulate(G, model, time_point_samples, num_runs=500, outpath = 'simu_out_oo.pdf', max_steps=None):
     G = nx.convert_node_labels_to_integers(G)
-    init_node_state = model.get_init_labeling()
+    init_node_state = model.get_init_labeling(G)
 
     for node in G.nodes():
         G.nodes[node]['state'] = init_node_state[node]
