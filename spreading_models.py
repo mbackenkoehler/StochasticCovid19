@@ -11,9 +11,7 @@ import seaborn as sns
 import scipy
 import glob
 import pickle
-import sys
 import collections
-from scipy.linalg import expm
 import heapq
 import copy
 

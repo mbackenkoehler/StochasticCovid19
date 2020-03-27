@@ -2,9 +2,7 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="27ba72f2-3376-423f-8c3c-5b40fdd2392e" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/output_complete.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/output_complete.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_erdosrenyi.csv" beforeDir="false" afterPath="$PROJECT_DIR$/output_erdosrenyi.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_erdosrenyi.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/output_erdosrenyi.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/spreading_models.py" beforeDir="false" afterPath="$PROJECT_DIR$/spreading_models.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -46,23 +44,27 @@
         </counts>
       </usages-collector>
     </session>
+    <session id="135660083">
+      <usages-collector id="statistics.lifecycle.project">
+        <counts>
+          <entry key="project.open.time.4" value="1" />
+          <entry key="project.opened" value="1" />
+        </counts>
+      </usages-collector>
+    </session>
   </component>
   <component name="FileEditorManager">
-    <leaf>
-      <file pinned="false" current-in-tab="false">
+    <leaf SIDE_TABS_SIZE_LIMIT_KEY="300">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/spreading_models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="240">
-              <caret line="16" column="12" selection-start-line="16" selection-start-column="7" selection-end-line="16" selection-end-column="12" />
-              <folding>
-                <marker date="1585309835721" expanded="true" signature="1767:1773" ph="..." />
-                <marker date="1585309835721" expanded="true" signature="4397:4752" ph="..." />
-              </folding>
+            <state relative-caret-position="165">
+              <caret line="11" column="11" lean-forward="true" selection-start-line="11" selection-start-column="11" selection-end-line="11" selection-end-column="11" />
             </state>
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/requirements.txt">
           <provider selected="true" editor-type-id="text-editor">
             <state relative-caret-position="105">
@@ -74,11 +76,8 @@
       <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/simulation.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2175">
+            <state relative-caret-position="645">
               <caret line="145" column="26" selection-start-line="145" selection-start-column="26" selection-end-line="145" selection-end-column="26" />
-              <folding>
-                <marker date="1585311241877" expanded="true" signature="4847:4936" ph="..." />
-              </folding>
             </state>
           </provider>
         </entry>
@@ -112,9 +111,9 @@
       <list>
         <option value="$PROJECT_DIR$/queue_test.py" />
         <option value="$PROJECT_DIR$/simulation_old.py" />
-        <option value="$PROJECT_DIR$/spreading_models.py" />
         <option value="$PROJECT_DIR$/simulation.py" />
         <option value="$PROJECT_DIR$/requirements.txt" />
+        <option value="$PROJECT_DIR$/spreading_models.py" />
       </list>
     </option>
   </component>
@@ -138,8 +137,8 @@
         <subPane>
           <expand>
             <path>
-              <item name="StochasticAndDeterministic" type="b2602c69:ProjectViewProjectNode" />
-              <item name="StochasticAndDeterministic" type="462c0819:PsiDirectoryNode" />
+              <item name="StochasticCovid19" type="b2602c69:ProjectViewProjectNode" />
+              <item name="StochasticCovid19" type="462c0819:PsiDirectoryNode" />
             </path>
           </expand>
           <select />
@@ -184,11 +183,11 @@
     <editor active="true" />
     <layout>
       <window_info id="Favorites" order="0" side_tool="true" />
-      <window_info active="true" content_ui="combo" id="Project" order="1" visible="true" weight="0.24949698" />
+      <window_info content_ui="combo" id="Project" order="1" visible="true" weight="0.25402415" />
       <window_info id="Structure" order="2" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Version Control" order="0" weight="0.32994455" />
       <window_info anchor="bottom" id="Database Changes" order="1" show_stripe_button="false" />
-      <window_info anchor="bottom" id="Terminal" order="2" visible="true" weight="0.32994455" />
+      <window_info active="true" anchor="bottom" id="Terminal" order="2" visible="true" weight="0.32994455" />
       <window_info anchor="bottom" id="Event Log" order="3" side_tool="true" />
       <window_info anchor="bottom" id="Python Console" order="4" />
       <window_info anchor="bottom" id="Docker" order="5" show_stripe_button="false" />
@@ -234,13 +233,7 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/simulation_old.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="137">
-          <caret line="56" column="14" selection-start-line="56" selection-start-column="4" selection-end-line="56" selection-end-column="14" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/simulation_old.py" />
     <entry file="file://$PROJECT_DIR$/.gitignore">
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="-853">
@@ -248,31 +241,11 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/queue_test.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="105">
-          <caret line="7" column="36" selection-start-line="7" selection-start-column="36" selection-end-line="7" selection-end-column="36" />
-        </state>
-      </provider>
-    </entry>
+    <entry file="file://$PROJECT_DIR$/queue_test.py" />
     <entry file="file://$PROJECT_DIR$/simulation.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2175">
+        <state relative-caret-position="645">
           <caret line="145" column="26" selection-start-line="145" selection-start-column="26" selection-end-line="145" selection-end-column="26" />
-          <folding>
-            <marker date="1585311241877" expanded="true" signature="4847:4936" ph="..." />
-          </folding>
-        </state>
-      </provider>
-    </entry>
-    <entry file="file://$PROJECT_DIR$/spreading_models.py">
-      <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="240">
-          <caret line="16" column="12" selection-start-line="16" selection-start-column="7" selection-end-line="16" selection-end-column="12" />
-          <folding>
-            <marker date="1585309835721" expanded="true" signature="1767:1773" ph="..." />
-            <marker date="1585309835721" expanded="true" signature="4397:4752" ph="..." />
-          </folding>
         </state>
       </provider>
     </entry>
@@ -280,6 +253,13 @@
       <provider selected="true" editor-type-id="text-editor">
         <state relative-caret-position="105">
           <caret line="7" column="5" selection-start-line="7" selection-start-column="5" selection-end-line="7" selection-end-column="5" />
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/spreading_models.py">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="165">
+          <caret line="11" column="11" lean-forward="true" selection-start-line="11" selection-start-column="11" selection-end-line="11" selection-end-column="11" />
         </state>
       </provider>
     </entry>
