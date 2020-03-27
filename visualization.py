@@ -2,6 +2,9 @@ import os
 import networkx as nx
 import matplotlib.pyplot as plt
 import numpy as np
+import seaborn as sns
+import imageio
+import glob
 
 def viz_simulate(G, time_points, storage, model, node_pos=None, outpath='output_simulation_NUM.jpg', storage_rec=None,
                  show_title=False):
@@ -12,6 +15,12 @@ def viz_simulate(G, time_points, storage, model, node_pos=None, outpath='output_
         pos = nx.spectral_layout(G)
         node_pos = [(pos[i][0], pos[i][1]) for i in range(G.number_of_nodes())]
 
+    color_palette = sns.color_palette("muted", len(model.states()))
+    try:
+        color_palette = [model.getcolors()[state] for state in model.states()]
+    except:
+        pass
+
     #storage = storage/np.max(storage)
     for i in range(storage.shape[1]):
         node_labels = list(storage[:,i])
@@ -20,9 +29,9 @@ def viz_simulate(G, time_points, storage, model, node_pos=None, outpath='output_
         # nodes
         for node in G.nodes():
             c = storage[node, i]
-            c_rgb = model.get_colors()[int(c+0.000001)]
-            s = 1.0 / len(node_pos) * 150 * 30
-            plt.scatter([node_pos[node][0]], [node_pos[node][1]], s=s, alpha=0.8, zorder=15, c=c_rgb)
+            c_rgb = [list(color_palette[int(c+0.000001)])]   #pyplot: Please use a 2-D array with a single row if you really want to specify the same RGB
+            s = 1.0 / len(node_pos) * 150 * 40
+            plt.scatter([node_pos[node][0]], [node_pos[node][1]], s=s, alpha=0.8, zorder=15, c=c_rgb, edgecolors='none')
 
         # edges
         lw = 1.0 / len(G.edges()) * 600
@@ -43,4 +52,18 @@ def viz_simulate(G, time_points, storage, model, node_pos=None, outpath='output_
         (plt.gca()).set_xticklabels([])
         plt.xticks([], [])
         plt.yticks([], [])
+
+        # legend
+        for color_i, state in enumerate(model.states()):
+            plt.plot([0, 0.0001], [0, 0.0001], label=state, c=color_palette[color_i],zorder=1) #todo make invsible (better)
+        plt.legend(bbox_to_anchor=(1.04, 1), loc="upper left")
+        plt.plot([0, 0.0001], [0, 0.0001], label=state, c='white', zorder=2, lw=5) # this is incredibly stupid
+
         plt.savefig('vis_out/' + outpath.replace('NUM', str(10000 + i)), bbox_inches='tight', dpi=300)
+
+    # from https://stackoverflow.com/questions/753190/programmatically-generate-video-or-animated-gif-in-python
+
+    with imageio.get_writer(outpath.replace('NUM','movie').replace('.jpg','.gif'), mode='I') as writer:
+        for filename in sorted(glob.glob('vis_out/' + outpath.replace('NUM', '*'))):
+            image = imageio.imread(filename)
+            writer.append_data(image)

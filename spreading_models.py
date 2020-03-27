@@ -121,7 +121,11 @@ class Corona:
         return ['S', 'E', 'I1', 'I2', 'I3', 'R', 'D']
 
     def get_colors(self):
-        return ['lightgray', 'orange', 'orangered', 'red', 'darkred', 'green', 'black']
+        color_palette = sns.color_palette("muted", len(self.states()))
+        colors = dict()
+        for i, state in self.states():
+            colors[state] = color_palette[i]
+        return colors
 
 
     def get_init_labeling(self, G):

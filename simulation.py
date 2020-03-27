@@ -147,11 +147,15 @@ def simulate(G, model, time_point_samples, num_runs=30, outpath = 'output.pdf', 
                 fraction_column.append(node_state_counts[node_state][x_i]/G.number_of_nodes())
     print('finished simulations')
 
-
     df = pd.DataFrame({'run_id': run_id_column, 'Time': time_point_column, 'State': state_column, 'Fraction':fraction_column})
     df.to_csv(outpath.replace('.pdf','.csv'))
     plt.clf()
-    sns.lineplot(x="Time", y="Fraction", hue='State', data=df, ci=95)
+    palette = None
+    try:
+        palette = model.get_colors()
+    except:
+        pass
+    sns.lineplot(x="Time", y="Fraction", hue='State', data=df, ci=95, palette = palette)
     plt.ylim([0,1])
     plt.xlim([0, time_point_samples[-1]])
     plt.legend(bbox_to_anchor=(1.04,1), loc="upper left")
@@ -182,7 +186,8 @@ if __name__ == "__main__":
     #cv = get_critical_value(G)
     #sis_model = SISmodel(infection_rate=cv*3)
     #sir_model = SIRmodel(infection_rate=cv * 7)
-    #visualization(nx.grid_2d_graph(20, 20), Corona(), np.linspace(0,100,30), outpath='output_grid_viz.pdf')
+
+    visualization(nx.grid_2d_graph(20, 20), Corona(), np.linspace(0,20,50), outpath='output_singlerun_grid_viz.pdf')
 
     corona_model = Corona()
     time_point_samples =  np.linspace(0,100,100)
