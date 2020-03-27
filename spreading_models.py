@@ -26,7 +26,7 @@ class SISmodel:
     def states(self):
         return ['I', 'S']
 
-    def get_init_labeling(self):
+    def get_init_labeling(self, G):
         init_node_state = {n: ('I' if random.random() > 0.9 else 'S') for n in range(G.number_of_nodes())}
         return init_node_state
 
@@ -88,15 +88,31 @@ class SIRmodel:
 
 
 class Corona:
-    def __init__(self):
-        self.s_to_e = 0.5
-        self.e_to_i1 = 0.5
-        self.i1_to_i2 = 0.2
-        self.i2_to_i3 = 0.2
-        self.i3_to_d = 0.5
-        self.i1_to_r = 0.1
-        self.i2_to_r = 0.05
-        self.i3_to_r = 0.05
+    def __init__(self, scale_by_mean_degree = True):
+
+        b1 = 0.500 # / number of nodes      # infection rate from i1
+        b2 = 0.100 # / number of nodes      # infection rate from i2
+        b3 = 0.100 # / number of nodes      # infection rate from i3
+        a = 0.200   # e to i1
+        g1 = 0.133  # i1 to r
+        g2 = 0.125  # i2 to r
+        g3 = 0.075  # i3 to r
+        p1 = 0.033  # i1 to i2
+        p2 = 0.042  # i2 to i3
+        u = 0.050   # i3 to death
+
+
+        self.s_to_e_dueto_i1 = b1
+        self.s_to_e_dueto_i2 = b2
+        self.s_to_e_dueto_i3 = b3
+        self.e_to_i1 = a
+        self.i1_to_i2 = p1
+        self.i2_to_i3 = p2
+        self.i3_to_d = u
+        self.i1_to_r = g1
+        self.i2_to_r = g2
+        self.i3_to_r = g3
+        self.scale_by_mean_degree = scale_by_mean_degree
 
 
     def states(self):
@@ -106,6 +122,8 @@ class Corona:
         init_node_state = {n: ('E' if random.random() > 0.90 else 'S') for n in range(G.number_of_nodes())}
         return init_node_state
 
+    def mean_degree(self, G):
+        return (2*len(G.edges()))/G.number_of_nodes()
 
     def aggregate(self, node_state_counts):
         node_state_counts['I_total'] = [0 for _ in range(len(node_state_counts['I1']))]
@@ -124,11 +142,16 @@ class Corona:
 
         if G.nodes[src_node]['state'] == 'S':
             new_state = 'E'
-            inf_neighbors = len([n for n in G.neighbors(src_node) if G.nodes[n]['state'] in ['I1','I2','I3']])
-            if inf_neighbors == 0:
+            neighbors =  G.neighbors(src_node)
+            count_i1 = len([n for n in neighbors if G.nodes[n]['state'] == 'I1'])
+            count_i2 = len([n for n in neighbors if G.nodes[n]['state'] == 'I2'])
+            count_i3 = len([n for n in neighbors if G.nodes[n]['state'] == 'I3'])
+            if count_i1 + count_i2 + count_i3 == 0:
                 fire_time = 10000000 + random.random()
             else:
-                node_rate = inf_neighbors * self.s_to_e
+                node_rate = count_i1 * self.s_to_e_dueto_i1 + count_i2 * self.s_to_e_dueto_i2  + count_i3 * self.s_to_e_dueto_i3
+                if self.scale_by_mean_degree:
+                    node_rate /= self.mean_degree(G)
                 fire_time = -np.log(random.random()) / node_rate
 
         elif G.nodes[src_node]['state'] == 'E':

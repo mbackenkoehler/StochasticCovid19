@@ -140,15 +140,26 @@ def simulate(G, model, time_point_samples, num_runs=100, outpath = 'output.pdf',
     sns.lineplot(x="Time", y="Fraction", hue='State', data=df, ci=95)
     plt.ylim([0,1])
     plt.xlim([0, time_point_samples[-1]])
-    plt.savefig(outpath)
+    plt.legend(bbox_to_anchor=(1.04,1), loc="upper left")
+    plt.savefig(outpath, bbox_inches="tight")
+    return df
 
+def final_mean_in_state(df, state='R'):
+    last_time_point = np.max(df['Time'])
+    df = df[df.apply(lambda line: line['Time'] == last_time_point and line['State'] == state, axis=1)]
+    if len(df['Fraction']) == 0:
+        return 0.0
+    return np.mean(df['Fraction'])
 
 
 if __name__ == "__main__":
     G = nx.grid_2d_graph(10,10)
+    #G = nx.complete_graph(100)
+    #G = nx.erdos_renyi_graph(n=100, p=0.1)
     cv = get_critical_value(G)
     sis_model = SISmodel(infection_rate=cv*3)
     sir_model = SIRmodel(infection_rate=cv * 7)
     corona_model = Corona()
-    time_point_samples =  np.linspace(0,50,100)
-    simulate(G, corona_model, time_point_samples)
+    time_point_samples =  np.linspace(0,200,200)
+    df = simulate(G, corona_model, time_point_samples, outpath = 'output_corona_scalegrid.pdf')
+    print('final mean dead:', final_mean_in_state(df, state='D'))
