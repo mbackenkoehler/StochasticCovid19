@@ -88,6 +88,10 @@ class SIRmodel:
 
 
 class Corona:
+    # created based on the model of Dr. Alison Hill
+    # find the excellent online tool at: https://alhill.shinyapps.io/COVID19seir/
+    # conversion to a networked model based on scaling infection rate based on the mean degree of the network
+
     def __init__(self, scale_by_mean_degree = True):
 
         b1 = 0.500 # / number of nodes      # infection rate from i1
