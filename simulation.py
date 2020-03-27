@@ -153,13 +153,14 @@ def final_mean_in_state(df, state='R'):
 
 
 if __name__ == "__main__":
-    G = nx.grid_2d_graph(10,10)
-    #G = nx.complete_graph(100)
-    #G = nx.erdos_renyi_graph(n=100, p=0.1)
-    cv = get_critical_value(G)
-    sis_model = SISmodel(infection_rate=cv*3)
-    sir_model = SIRmodel(infection_rate=cv * 7)
+    #cv = get_critical_value(G)
+    #sis_model = SISmodel(infection_rate=cv*3)
+    #sir_model = SIRmodel(infection_rate=cv * 7)
     corona_model = Corona()
     time_point_samples =  np.linspace(0,200,200)
-    df = simulate(G, corona_model, time_point_samples, outpath = 'output_corona_scalegrid.pdf')
-    print('final mean dead:', final_mean_in_state(df, state='D'))
+    df = simulate(nx.grid_2d_graph(10,10), corona_model, time_point_samples, outpath = 'output_grid.pdf')
+    print('final mean dead grid:', final_mean_in_state(df, state='D'))
+    df = simulate(nx.complete_graph(100), corona_model, time_point_samples, outpath='output_complete.pdf')
+    print('final mean dead complete:', final_mean_in_state(df, state='D'))
+    df = simulate(nx.erdos_renyi_graph(n=100, p=0.1), corona_model, time_point_samples, outpath='output_erdosrenyi.pdf')
+    print('final mean dead erdos:', final_mean_in_state(df, state='D'))
