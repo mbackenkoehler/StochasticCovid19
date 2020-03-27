@@ -2,8 +2,13 @@
 <project version="4">
   <component name="ChangeListManager">
     <list default="true" id="27ba72f2-3376-423f-8c3c-5b40fdd2392e" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/queue_test.py" beforeDir="false" />
-      <change beforePath="$PROJECT_DIR$/spreading_models.py" beforeDir="false" afterPath="$PROJECT_DIR$/spreading_models.py" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_complete.csv" beforeDir="false" afterPath="$PROJECT_DIR$/output_complete.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_complete.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/output_complete.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_erdosrenyi.csv" beforeDir="false" afterPath="$PROJECT_DIR$/output_erdosrenyi.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_erdosrenyi.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/output_erdosrenyi.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_grid.csv" beforeDir="false" afterPath="$PROJECT_DIR$/output_grid.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_grid.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/output_grid.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/simulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/simulation.py" afterDir="false" />
     </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
@@ -33,23 +38,23 @@
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
-          <entry key="py" value="4952" />
+          <entry key="py" value="5149" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
-          <entry key="Python" value="4952" />
+          <entry key="Python" value="5149" />
         </counts>
       </usages-collector>
     </session>
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/spreading_models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="342">
-              <caret line="104" column="30" lean-forward="true" selection-start-line="104" selection-start-column="30" selection-end-line="104" selection-end-column="30" />
+            <state relative-caret-position="2340">
+              <caret line="156" column="45" selection-start-line="156" selection-start-column="45" selection-end-line="156" selection-end-column="45" />
               <folding>
                 <marker date="1585309835721" expanded="true" signature="1767:1773" ph="..." />
                 <marker date="1585309835721" expanded="true" signature="4397:4752" ph="..." />
@@ -58,13 +63,13 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/simulation.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="540">
-              <caret line="161" column="54" selection-start-line="161" selection-start-column="35" selection-end-line="161" selection-end-column="54" />
+            <state relative-caret-position="387">
+              <caret line="137" column="31" selection-start-line="137" selection-start-column="31" selection-end-line="137" selection-end-column="31" />
               <folding>
-                <marker date="1585309612488" expanded="true" signature="4477:4711" ph="..." />
+                <marker date="1585311241877" expanded="true" signature="4847:4936" ph="..." />
               </folding>
             </state>
           </provider>
@@ -98,8 +103,8 @@
       <list>
         <option value="$PROJECT_DIR$/queue_test.py" />
         <option value="$PROJECT_DIR$/simulation_old.py" />
-        <option value="$PROJECT_DIR$/simulation.py" />
         <option value="$PROJECT_DIR$/spreading_models.py" />
+        <option value="$PROJECT_DIR$/simulation.py" />
       </list>
     </option>
   </component>
@@ -240,23 +245,23 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/simulation.py">
+    <entry file="file://$PROJECT_DIR$/spreading_models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="540">
-          <caret line="161" column="54" selection-start-line="161" selection-start-column="35" selection-end-line="161" selection-end-column="54" />
+        <state relative-caret-position="2340">
+          <caret line="156" column="45" selection-start-line="156" selection-start-column="45" selection-end-line="156" selection-end-column="45" />
           <folding>
-            <marker date="1585309612488" expanded="true" signature="4477:4711" ph="..." />
+            <marker date="1585309835721" expanded="true" signature="1767:1773" ph="..." />
+            <marker date="1585309835721" expanded="true" signature="4397:4752" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/spreading_models.py">
+    <entry file="file://$PROJECT_DIR$/simulation.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="342">
-          <caret line="104" column="30" lean-forward="true" selection-start-line="104" selection-start-column="30" selection-end-line="104" selection-end-column="30" />
+        <state relative-caret-position="387">
+          <caret line="137" column="31" selection-start-line="137" selection-start-column="31" selection-end-line="137" selection-end-column="31" />
           <folding>
-            <marker date="1585309835721" expanded="true" signature="1767:1773" ph="..." />
-            <marker date="1585309835721" expanded="true" signature="4397:4752" ph="..." />
+            <marker date="1585311241877" expanded="true" signature="4847:4936" ph="..." />
           </folding>
         </state>
       </provider>

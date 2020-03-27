@@ -1,3 +1,6 @@
+import warnings
+warnings.filterwarnings("ignore")
+
 import matplotlib
 matplotlib.use('Agg')
 import matplotlib.pyplot as plt
@@ -132,16 +135,18 @@ def simulate(G, model, time_point_samples, num_runs=100, outpath = 'output.pdf',
                 time_point_column.append(time_point)
                 state_column.append(node_state)
                 fraction_column.append(node_state_counts[node_state][x_i]/G.number_of_nodes())
-    print('')
+    print('finished simulations')
 
 
     df = pd.DataFrame({'run_id': run_id_column, 'Time': time_point_column, 'State': state_column, 'Fraction':fraction_column})
     df.to_csv(outpath.replace('.pdf','.csv'))
+    plt.clf()
     sns.lineplot(x="Time", y="Fraction", hue='State', data=df, ci=95)
     plt.ylim([0,1])
     plt.xlim([0, time_point_samples[-1]])
     plt.legend(bbox_to_anchor=(1.04,1), loc="upper left")
     plt.savefig(outpath, bbox_inches="tight")
+    plt.show(block=False)
     return df
 
 def final_mean_in_state(df, state='R'):
@@ -151,6 +156,10 @@ def final_mean_in_state(df, state='R'):
         return 0.0
     return np.mean(df['Fraction'])
 
+def final_mean(df, model):
+    return {state: final_mean_in_state(df, state=state) for state in model.states()}
+
+
 
 if __name__ == "__main__":
     #cv = get_critical_value(G)
@@ -159,8 +168,8 @@ if __name__ == "__main__":
     corona_model = Corona()
     time_point_samples =  np.linspace(0,200,200)
     df = simulate(nx.grid_2d_graph(10,10), corona_model, time_point_samples, outpath = 'output_grid.pdf')
-    print('final mean dead grid:', final_mean_in_state(df, state='D'))
+    print('final mean grid:', final_mean(df, corona_model))
     df = simulate(nx.complete_graph(100), corona_model, time_point_samples, outpath='output_complete.pdf')
-    print('final mean dead complete:', final_mean_in_state(df, state='D'))
+    print('final mean complete:', final_mean(df, corona_model))
     df = simulate(nx.erdos_renyi_graph(n=100, p=0.1), corona_model, time_point_samples, outpath='output_erdosrenyi.pdf')
-    print('final mean dead erdos:', final_mean_in_state(df, state='D'))
+    print('final mean erdos renyi:', final_mean(df, corona_model))
