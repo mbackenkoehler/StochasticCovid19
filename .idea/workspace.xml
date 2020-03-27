@@ -1,7 +1,11 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="27ba72f2-3376-423f-8c3c-5b40fdd2392e" name="Default Changelist" comment="" />
+    <list default="true" id="27ba72f2-3376-423f-8c3c-5b40fdd2392e" name="Default Changelist" comment="">
+      <change beforePath="$PROJECT_DIR$/output_complete.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/output_complete.pdf" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_erdosrenyi.csv" beforeDir="false" afterPath="$PROJECT_DIR$/output_erdosrenyi.csv" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/output_erdosrenyi.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/output_erdosrenyi.pdf" afterDir="false" />
+    </list>
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -20,21 +24,24 @@
         <counts>
           <entry key="gitignore" value="1" />
           <entry key="py" value="6" />
+          <entry key="txt" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.open">
         <counts>
-          <entry key="PLAIN_TEXT" value="1" />
+          <entry key="PLAIN_TEXT" value="2" />
           <entry key="Python" value="6" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.extensions.edit">
         <counts>
           <entry key="py" value="5149" />
+          <entry key="txt" value="1" />
         </counts>
       </usages-collector>
       <usages-collector id="statistics.file.types.edit">
         <counts>
+          <entry key="PLAIN_TEXT" value="1" />
           <entry key="Python" value="5149" />
         </counts>
       </usages-collector>
@@ -42,15 +49,24 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/spreading_models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="1968">
-              <caret line="156" column="45" selection-start-line="156" selection-start-column="45" selection-end-line="156" selection-end-column="45" />
+            <state relative-caret-position="240">
+              <caret line="16" column="12" selection-start-line="16" selection-start-column="7" selection-end-line="16" selection-end-column="12" />
               <folding>
                 <marker date="1585309835721" expanded="true" signature="1767:1773" ph="..." />
                 <marker date="1585309835721" expanded="true" signature="4397:4752" ph="..." />
               </folding>
+            </state>
+          </provider>
+        </entry>
+      </file>
+      <file pinned="false" current-in-tab="true">
+        <entry file="file://$PROJECT_DIR$/requirements.txt">
+          <provider selected="true" editor-type-id="text-editor">
+            <state relative-caret-position="105">
+              <caret line="7" column="5" selection-start-line="7" selection-start-column="5" selection-end-line="7" selection-end-column="5" />
             </state>
           </provider>
         </entry>
@@ -98,6 +114,7 @@
         <option value="$PROJECT_DIR$/simulation_old.py" />
         <option value="$PROJECT_DIR$/spreading_models.py" />
         <option value="$PROJECT_DIR$/simulation.py" />
+        <option value="$PROJECT_DIR$/requirements.txt" />
       </list>
     </option>
   </component>
@@ -167,11 +184,11 @@
     <editor active="true" />
     <layout>
       <window_info id="Favorites" order="0" side_tool="true" />
-      <window_info content_ui="combo" id="Project" order="1" visible="true" weight="0.24949698" />
+      <window_info active="true" content_ui="combo" id="Project" order="1" visible="true" weight="0.24949698" />
       <window_info id="Structure" order="2" side_tool="true" weight="0.25" />
       <window_info anchor="bottom" id="Version Control" order="0" weight="0.32994455" />
       <window_info anchor="bottom" id="Database Changes" order="1" show_stripe_button="false" />
-      <window_info active="true" anchor="bottom" id="Terminal" order="2" visible="true" weight="0.32994455" />
+      <window_info anchor="bottom" id="Terminal" order="2" visible="true" weight="0.32994455" />
       <window_info anchor="bottom" id="Event Log" order="3" side_tool="true" />
       <window_info anchor="bottom" id="Python Console" order="4" />
       <window_info anchor="bottom" id="Docker" order="5" show_stripe_button="false" />
@@ -250,12 +267,19 @@
     </entry>
     <entry file="file://$PROJECT_DIR$/spreading_models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="1968">
-          <caret line="156" column="45" selection-start-line="156" selection-start-column="45" selection-end-line="156" selection-end-column="45" />
+        <state relative-caret-position="240">
+          <caret line="16" column="12" selection-start-line="16" selection-start-column="7" selection-end-line="16" selection-end-column="12" />
           <folding>
             <marker date="1585309835721" expanded="true" signature="1767:1773" ph="..." />
             <marker date="1585309835721" expanded="true" signature="4397:4752" ph="..." />
           </folding>
+        </state>
+      </provider>
+    </entry>
+    <entry file="file://$PROJECT_DIR$/requirements.txt">
+      <provider selected="true" editor-type-id="text-editor">
+        <state relative-caret-position="105">
+          <caret line="7" column="5" selection-start-line="7" selection-start-column="5" selection-end-line="7" selection-end-column="5" />
         </state>
       </provider>
     </entry>
