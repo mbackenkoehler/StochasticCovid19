@@ -1,15 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
   <component name="ChangeListManager">
-    <list default="true" id="27ba72f2-3376-423f-8c3c-5b40fdd2392e" name="Default Changelist" comment="">
-      <change beforePath="$PROJECT_DIR$/output_complete.csv" beforeDir="false" afterPath="$PROJECT_DIR$/output_complete.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_complete.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/output_complete.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_erdosrenyi.csv" beforeDir="false" afterPath="$PROJECT_DIR$/output_erdosrenyi.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_erdosrenyi.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/output_erdosrenyi.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_grid.csv" beforeDir="false" afterPath="$PROJECT_DIR$/output_grid.csv" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/output_grid.pdf" beforeDir="false" afterPath="$PROJECT_DIR$/output_grid.pdf" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/simulation.py" beforeDir="false" afterPath="$PROJECT_DIR$/simulation.py" afterDir="false" />
-    </list>
+    <list default="true" id="27ba72f2-3376-423f-8c3c-5b40fdd2392e" name="Default Changelist" comment="" />
     <option name="EXCLUDED_CONVERTED_TO_IGNORED" value="true" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -50,10 +42,10 @@
   </component>
   <component name="FileEditorManager">
     <leaf>
-      <file pinned="false" current-in-tab="false">
+      <file pinned="false" current-in-tab="true">
         <entry file="file://$PROJECT_DIR$/spreading_models.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="2340">
+            <state relative-caret-position="1968">
               <caret line="156" column="45" selection-start-line="156" selection-start-column="45" selection-end-line="156" selection-end-column="45" />
               <folding>
                 <marker date="1585309835721" expanded="true" signature="1767:1773" ph="..." />
@@ -63,11 +55,11 @@
           </provider>
         </entry>
       </file>
-      <file pinned="false" current-in-tab="true">
+      <file pinned="false" current-in-tab="false">
         <entry file="file://$PROJECT_DIR$/simulation.py">
           <provider selected="true" editor-type-id="text-editor">
-            <state relative-caret-position="387">
-              <caret line="137" column="31" selection-start-line="137" selection-start-column="31" selection-end-line="137" selection-end-column="31" />
+            <state relative-caret-position="2175">
+              <caret line="145" column="26" selection-start-line="145" selection-start-column="26" selection-end-line="145" selection-end-column="26" />
               <folding>
                 <marker date="1585311241877" expanded="true" signature="4847:4936" ph="..." />
               </folding>
@@ -93,6 +85,7 @@
       <find>get_init_labeling</find>
       <find>pyc</find>
       <find>mean</find>
+      <find>last_changed</find>
     </findStrings>
   </component>
   <component name="Git.Settings">
@@ -245,23 +238,23 @@
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/spreading_models.py">
+    <entry file="file://$PROJECT_DIR$/simulation.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="2340">
-          <caret line="156" column="45" selection-start-line="156" selection-start-column="45" selection-end-line="156" selection-end-column="45" />
+        <state relative-caret-position="2175">
+          <caret line="145" column="26" selection-start-line="145" selection-start-column="26" selection-end-line="145" selection-end-column="26" />
           <folding>
-            <marker date="1585309835721" expanded="true" signature="1767:1773" ph="..." />
-            <marker date="1585309835721" expanded="true" signature="4397:4752" ph="..." />
+            <marker date="1585311241877" expanded="true" signature="4847:4936" ph="..." />
           </folding>
         </state>
       </provider>
     </entry>
-    <entry file="file://$PROJECT_DIR$/simulation.py">
+    <entry file="file://$PROJECT_DIR$/spreading_models.py">
       <provider selected="true" editor-type-id="text-editor">
-        <state relative-caret-position="387">
-          <caret line="137" column="31" selection-start-line="137" selection-start-column="31" selection-end-line="137" selection-end-column="31" />
+        <state relative-caret-position="1968">
+          <caret line="156" column="45" selection-start-line="156" selection-start-column="45" selection-end-line="156" selection-end-column="45" />
           <folding>
-            <marker date="1585311241877" expanded="true" signature="4847:4936" ph="..." />
+            <marker date="1585309835721" expanded="true" signature="1767:1773" ph="..." />
+            <marker date="1585309835721" expanded="true" signature="4397:4752" ph="..." />
           </folding>
         </state>
       </provider>
