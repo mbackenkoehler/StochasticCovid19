@@ -108,7 +108,7 @@ def simulation_run(G, model, time_point_samples, at_leat_one=False, max_steps=No
 
 
 
-def simulate(G, model, time_point_samples, num_runs=100, outpath = 'output.pdf', max_steps=None):
+def simulate(G, model, time_point_samples, num_runs=30, outpath = 'output.pdf', max_steps=None):
     G = nx.convert_node_labels_to_integers(G)
     init_node_state = model.get_init_labeling(G)
 
@@ -166,7 +166,7 @@ if __name__ == "__main__":
     #sis_model = SISmodel(infection_rate=cv*3)
     #sir_model = SIRmodel(infection_rate=cv * 7)
     corona_model = Corona()
-    time_point_samples =  np.linspace(0,200,200)
+    time_point_samples =  np.linspace(0,100,100)
     df = simulate(nx.grid_2d_graph(10,10), corona_model, time_point_samples, outpath = 'output_grid.pdf')
     print('final mean grid:', final_mean(df, corona_model))
     df = simulate(nx.complete_graph(100), corona_model, time_point_samples, outpath='output_complete.pdf')
