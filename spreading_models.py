@@ -120,6 +120,10 @@ class Corona:
     def states(self):
         return ['S', 'E', 'I1', 'I2', 'I3', 'R', 'D']
 
+    def get_colors(self):
+        return ['lightgray', 'orange', 'orangered', 'red', 'darkred', 'green', 'black']
+
+
     def get_init_labeling(self, G):
         init_node_state = {n: ('E' if random.random() > 0.90 else 'S') for n in range(G.number_of_nodes())}
         return init_node_state

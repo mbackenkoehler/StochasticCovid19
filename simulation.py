@@ -19,6 +19,7 @@ import collections
 from scipy.linalg import expm
 import heapq
 import copy
+from visualization import viz_simulate
 
 
 #
@@ -42,13 +43,16 @@ def get_critical_value(contact_network):
     return beta
 
 
-def simulation_run(G, model, time_point_samples, at_leat_one=False, max_steps=None):
+def simulation_run(G, model, time_point_samples, at_leat_one=False, max_steps=None, node_wise_matrix=None):
     global_clock = 0.0
     step_i = 0
+    time_point_sample_index = 0
     event_queue = [] # init
     x_values = list(time_point_samples)
     y_values = {state: list() for state in model.states()}  # record of trajectory
     node_counter = {state: len([n for n in G.nodes() if G.nodes[n]['state'] == state]) for state in model.states()}
+    if node_wise_matrix is not None:
+        assert(node_wise_matrix.shape == (G.number_of_nodes(), len(x_values)))
     # init event_id
     for node_i in G.nodes():
         G.nodes[node_i]['event_id'] = 0
@@ -73,7 +77,11 @@ def simulation_run(G, model, time_point_samples, at_leat_one=False, max_steps=No
         while len(x_values)>0 and global_clock >= x_values[0]:
             for state in model.states():
                 y_values[state].append(node_counter[state])
+            if node_wise_matrix is not None:
+                for n in G.nodes():
+                    node_wise_matrix[n, time_point_sample_index] = model.states().index(G.nodes[n]['state'])
             x_values = x_values[1:]
+            time_point_sample_index += 1
         if len(x_values) == 0:
             return y_values
 
@@ -108,7 +116,7 @@ def simulation_run(G, model, time_point_samples, at_leat_one=False, max_steps=No
 
 
 
-def simulate(G, model, time_point_samples, num_runs=30, outpath = 'output.pdf', max_steps=None):
+def simulate(G, model, time_point_samples, num_runs=30, outpath = 'output.pdf', max_steps=None, node_wise_matrix=None):
     G = nx.convert_node_labels_to_integers(G)
     init_node_state = model.get_init_labeling(G)
 
@@ -123,7 +131,9 @@ def simulate(G, model, time_point_samples, num_runs=30, outpath = 'output.pdf', 
     fraction_column = list()
     for run_i in range(num_runs):
         G_run_i = copy.deepcopy(G) # to not overwrite
-        node_state_counts = simulation_run(G_run_i, model, time_point_samples, at_leat_one=False, max_steps=max_steps)
+
+        node_state_counts = simulation_run(G_run_i, model, time_point_samples, at_leat_one=False, max_steps=max_steps, node_wise_matrix=node_wise_matrix)
+
         try:
             node_state_counts = model.aggregate(node_state_counts)
         except:
@@ -160,11 +170,20 @@ def final_mean(df, model):
     return {state: final_mean_in_state(df, state=state) for state in model.states()}
 
 
+def visualization(G, model, time_point_samples, outpath = 'vit_out.gif'):
+    G = nx.convert_node_labels_to_integers(G)
+    node_wise_matrix = np.zeros([G.number_of_nodes(), len(time_point_samples)])
+    simulate(G, model, time_point_samples, num_runs=1, outpath = outpath, node_wise_matrix=node_wise_matrix)
+    viz_simulate(G, time_point_samples, node_wise_matrix, model)
+
+
 
 if __name__ == "__main__":
     #cv = get_critical_value(G)
     #sis_model = SISmodel(infection_rate=cv*3)
     #sir_model = SIRmodel(infection_rate=cv * 7)
+    #visualization(nx.grid_2d_graph(20, 20), Corona(), np.linspace(0,100,30), outpath='output_grid_viz.pdf')
+
     corona_model = Corona()
     time_point_samples =  np.linspace(0,100,100)
     df = simulate(nx.grid_2d_graph(10,10), corona_model, time_point_samples, outpath = 'output_grid.pdf')
