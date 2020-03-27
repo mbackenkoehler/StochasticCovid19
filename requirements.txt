@@ -4,5 +4,4 @@ numpy
 matplotlib
 networkx
 scipy
-tqdm
-heapq
+#tqdm
