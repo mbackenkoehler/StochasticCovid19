@@ -1,5 +1,5 @@
 
-# Stochastic Simulation of COVID-19 on Networks
+# Stochastic COVID-19 Simulation on Networks
 [![Build Status](https://travis-ci.com/gerritgr/StochasticCovid19.svg?token=qQ7vTmAySdBppYxywojC&branch=master)](https://travis-ci.com/gerritgr/StochasticCovid19)
 
 Copyright: 2020, [Gerrit Großmann](https://mosi.uni-saarland.de/people/gerrit/), [Group of Modeling and Simulation](https://mosi.uni-saarland.de/) at [Saarland University](http://www.cs.uni-saarland.de/)
