@@ -11,7 +11,6 @@ Version: 0.1 (Please note that this is proof-of-concept code in a very early dev
 ## Overview
 ------------------
 ![Animation](https://github.com/gerritgr/StochasticCovid19/raw/master/anim-opt.gif)
-![Lineplot](https://github.com/gerritgr/StochasticCovid19/raw/master/output_geom.jpg)
 
 Stochastic (Monte-Carlo) simulation of the of Covid-19 pandemic (of the SARS-CoV-2 virus) on complex networks (contact graphs).
 The model falls under the general class of a SEIR compartment models.  
@@ -30,3 +29,10 @@ With
 ```console
 python simulation.py
 ```
+
+
+## Output
+-----------------
+Dataframe as .csv file and corrsponding lineplot.
+Animations can be created with the visualization function. 
+![Lineplot](https://github.com/gerritgr/StochasticCovid19/raw/master/output_geom.jpg)
