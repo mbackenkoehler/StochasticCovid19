@@ -116,7 +116,7 @@ def simulation_run(G, model, time_point_samples, at_leat_one=False, max_steps=No
 
 
 
-def simulate(G, model, time_point_samples, num_runs=100, outpath = 'output/output.pdf', max_steps=None, node_wise_matrix=None):
+def simulate(G, model, time_point_samples, num_runs=30, outpath = 'output/output.pdf', max_steps=None, node_wise_matrix=None):
     G = nx.convert_node_labels_to_integers(G)
     init_node_state = model.get_init_labeling(G)
     pbar = tqdm(total=num_runs)
