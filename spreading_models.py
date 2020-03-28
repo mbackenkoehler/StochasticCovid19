@@ -226,3 +226,34 @@ class Corona:
         G.nodes[src_node]['event_id'] = event_id
         new_time = global_clock + fire_time
         return new_time, src_node, new_state, event_id
+
+
+    # ODE
+
+    # has to be a vector in the order of models.states()
+    def ode_init(self, number_of_units=1):
+        init = [0.95, 0.05, 0.0, 0.0, 0.0, 0.0, 0.0]
+        init = [x/number_of_units for x in init]
+        self.number_of_units = number_of_units
+        return init
+
+    def ode_func(self, population_vector, t):
+        s = population_vector[0]
+        e = population_vector[1]
+        i1 = population_vector[2]
+        i2 = population_vector[3]
+        i3 = population_vector[4]
+        r = population_vector[5]
+        d = population_vector[6]
+
+        s_grad = -(self.s_to_e_dueto_i1/self.number_of_units*i1+self.s_to_e_dueto_i2/self.number_of_units*i3+self.s_to_e_dueto_i3/self.number_of_units*i3)*s
+        e_grad = (self.s_to_e_dueto_i1/self.number_of_units*i1+self.s_to_e_dueto_i2/self.number_of_units*i3+self.s_to_e_dueto_i3/self.number_of_units*i3)*s - self.e_to_i1/self.number_of_units * e
+        i1_grad = self.e_to_i1/self.number_of_units * e - (self.i1_to_r + self.i1_to_i2) * i1
+        i2_grad = self.i1_to_i2 * i1 - (self.i2_to_r + self.i2_to_i3) * i2
+        i3_grad = self.i2_to_i3 * i2 - (self.i3_to_r + self.i3_to_d) * i3
+        r_grad = self.i1_to_r * i1 + self.i2_to_r * i2 + self.i3_to_r * i3
+        d_grad = self.i3_to_d * i3
+
+        grad = [s_grad, e_grad, i1_grad, i2_grad, i3_grad, r_grad, d_grad]
+
+        return grad

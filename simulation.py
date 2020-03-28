@@ -19,6 +19,7 @@ from scipy.linalg import expm
 import heapq
 import copy
 from visualization import viz_simulate, geom_graph
+from tqdm import tqdm
 
 
 #
@@ -115,9 +116,11 @@ def simulation_run(G, model, time_point_samples, at_leat_one=False, max_steps=No
 
 
 
-def simulate(G, model, time_point_samples, num_runs=30, outpath = 'output.pdf', max_steps=None, node_wise_matrix=None):
+def simulate(G, model, time_point_samples, num_runs=100, outpath = 'output/output.pdf', max_steps=None, node_wise_matrix=None):
     G = nx.convert_node_labels_to_integers(G)
     init_node_state = model.get_init_labeling(G)
+    pbar = tqdm(total=num_runs)
+    pbar.set_description('Simulations')
 
     for node in G.nodes():
         G.nodes[node]['state'] = init_node_state[node]
@@ -137,17 +140,17 @@ def simulate(G, model, time_point_samples, num_runs=30, outpath = 'output.pdf', 
             node_state_counts = model.aggregate(node_state_counts)
         except:
             pass
-        print('.', end='')
+        pbar.update(1)
         for x_i, time_point in enumerate(time_point_samples):
             for node_state, fractions in node_state_counts.items():
                 run_id_column.append(run_i)
                 time_point_column.append(time_point)
                 state_column.append(node_state)
                 fraction_column.append(node_state_counts[node_state][x_i]/G.number_of_nodes())
-    print('finished simulations')
+    pbar.close()
 
     df = pd.DataFrame({'run_id': run_id_column, 'Time': time_point_column, 'State': state_column, 'Fraction':fraction_column})
-    df.to_csv(outpath.replace('.pdf','.csv'))
+    df.to_csv(outpath + '.csv')
     lineplot(df, model, time_point_samples, outpath)
     return df
 
@@ -164,6 +167,9 @@ def lineplot(df, model, time_point_samples, outpath):
     plt.legend(bbox_to_anchor=(1.04,1), loc="upper left")
     plt.savefig(outpath, bbox_inches="tight")
     plt.show(block=False)
+    #plt.ylim([0,0.15])
+    #plt.savefig(outpath.replace('.','trunc.'), bbox_inches="tight")
+    #plt.show(block=False)
 
 def final_mean_in_state(df, state='R'):
     last_time_point = np.max(df['Time'])
@@ -182,9 +188,34 @@ def visualization(G, model, time_point_samples, outpath = 'vit_out.gif', node_po
     simulate(G, model, time_point_samples, num_runs=1, outpath = outpath, node_wise_matrix=node_wise_matrix)
     viz_simulate(G, time_point_samples, node_wise_matrix, model, node_pos=node_pos)
 
+def solve_ode(model, time_point_samples, outpath = 'output/output_ode.pdf'):
+    plt.clf()
+    from scipy.integrate import odeint
+    init = model.ode_init()
+    f = model.ode_func
+    sol = odeint(f, init, time_point_samples)
+    np.savetxt(outpath+'.csv', sol)
+    for state_i, state in enumerate(model.states()):
+        sol_i = sol[:,state_i]
+        try:
+            c = model.get_colors()[state]
+        except:
+            c = None
+        plt.plot(time_point_samples, sol_i, label=state, c=c, alpha=0.8, lw=2)
+    plt.legend(bbox_to_anchor=(1.04,1), loc="upper left")
+    plt.ylim([0,1])
+    plt.xlim([0, time_point_samples[-1]])
+    plt.savefig(outpath, bbox_inches="tight")
+    plt.show(block=False)
+    print('final values of ODE: ', {model.states()[i]:sol[-1,i] for i in range(len(model.states()))})
+    return sol
 
 
 if __name__ == "__main__":
+    os.system('mkdir output/')
+
+    solve_ode(Corona(),  np.linspace(0,100,500))
+
     #cv = get_critical_value(G)
     #sis_model = SISmodel(infection_rate=cv*3)
     #sir_model = SIRmodel(infection_rate=cv * 7)
@@ -197,11 +228,11 @@ if __name__ == "__main__":
 
     corona_model = Corona()
     time_point_samples =  np.linspace(0,100,100)
-    df = simulate(nx.grid_2d_graph(10,10), corona_model, time_point_samples, outpath = 'output_grid.pdf')
+    df = simulate(nx.grid_2d_graph(10,10), corona_model, time_point_samples, outpath = 'output/output_grid.pdf')
     print('final mean grid:', final_mean(df, corona_model))
-    df = simulate(nx.complete_graph(100), corona_model, time_point_samples, outpath='output_complete.pdf')
+    df = simulate(nx.complete_graph(100), corona_model, time_point_samples, outpath='output/output_complete.pdf')
     print('final mean complete:', final_mean(df, corona_model))
-    df = simulate(nx.erdos_renyi_graph(n=100, p=0.1), corona_model, time_point_samples, outpath='output_erdosrenyi.pdf')
+    df = simulate(nx.erdos_renyi_graph(n=100, p=0.1), corona_model, time_point_samples, outpath='output/output_erdosrenyi.pdf')
     print('final mean erdos renyi:', final_mean(df, corona_model))
-    df = simulate(G_geom,  Corona(init_exposed=[0], scale_by_mean_degree=False), time_point_samples, outpath='output_geom.jpg', num_runs=50)
+    df = simulate(G_geom,  Corona(init_exposed=[0], scale_by_mean_degree=False), time_point_samples, outpath='output/output_geom.jpg', num_runs=50)
     print('final mean geometric network:', final_mean(df, corona_model))

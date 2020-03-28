@@ -35,4 +35,4 @@ python simulation.py
 -----------------
 Dataframe as .csv file and corrsponding lineplot.
 Animations can be created with the visualization function. 
-![Lineplot](https://github.com/gerritgr/StochasticCovid19/raw/master/output_geom.jpg)
+![Lineplot](https://github.com/gerritgr/StochasticCovid19/raw/master/example_geom.jpg)
