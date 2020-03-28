@@ -2,7 +2,6 @@ import warnings
 warnings.filterwarnings("ignore")
 
 import matplotlib
-matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 import networkx as nx
 import pandas as pd
@@ -19,7 +18,7 @@ import collections
 from scipy.linalg import expm
 import heapq
 import copy
-from visualization import viz_simulate
+from visualization import viz_simulate, geom_graph
 
 
 #
@@ -149,6 +148,10 @@ def simulate(G, model, time_point_samples, num_runs=30, outpath = 'output.pdf', 
 
     df = pd.DataFrame({'run_id': run_id_column, 'Time': time_point_column, 'State': state_column, 'Fraction':fraction_column})
     df.to_csv(outpath.replace('.pdf','.csv'))
+    lineplot(df, model, time_point_samples, outpath)
+    return df
+
+def lineplot(df, model, time_point_samples, outpath):
     plt.clf()
     palette = None
     try:
@@ -161,7 +164,6 @@ def simulate(G, model, time_point_samples, num_runs=30, outpath = 'output.pdf', 
     plt.legend(bbox_to_anchor=(1.04,1), loc="upper left")
     plt.savefig(outpath, bbox_inches="tight")
     plt.show(block=False)
-    return df
 
 def final_mean_in_state(df, state='R'):
     last_time_point = np.max(df['Time'])
@@ -174,11 +176,11 @@ def final_mean(df, model):
     return {state: final_mean_in_state(df, state=state) for state in model.states()}
 
 
-def visualization(G, model, time_point_samples, outpath = 'vit_out.gif'):
+def visualization(G, model, time_point_samples, outpath = 'vit_out.gif', node_pos=None):
     G = nx.convert_node_labels_to_integers(G)
     node_wise_matrix = np.zeros([G.number_of_nodes(), len(time_point_samples)])
     simulate(G, model, time_point_samples, num_runs=1, outpath = outpath, node_wise_matrix=node_wise_matrix)
-    viz_simulate(G, time_point_samples, node_wise_matrix, model)
+    viz_simulate(G, time_point_samples, node_wise_matrix, model, node_pos=node_pos)
 
 
 
@@ -187,7 +189,9 @@ if __name__ == "__main__":
     #sis_model = SISmodel(infection_rate=cv*3)
     #sir_model = SIRmodel(infection_rate=cv * 7)
 
-    visualization(nx.grid_2d_graph(20, 20), Corona(), np.linspace(0,20,50), outpath='output_singlerun_grid_viz.pdf')
+    G, node_pos = geom_graph()
+    # G = nx.grid_2d_graph(20, 20)
+    visualization(G, Corona(), np.linspace(0,50,50), outpath='output_singlerun_geom_viz.pdf', node_pos=node_pos)
 
     corona_model = Corona()
     time_point_samples =  np.linspace(0,100,100)

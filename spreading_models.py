@@ -121,10 +121,14 @@ class Corona:
         return ['S', 'E', 'I1', 'I2', 'I3', 'R', 'D']
 
     def get_colors(self):
-        color_palette = sns.color_palette("muted", len(self.states()))
-        colors = dict()
-        for i, state in self.states():
-            colors[state] = color_palette[i]
+        #color_palette = sns.color_palette("muted", len(self.states()))
+        #colors = dict()
+        #for i, state in self.states():
+        #    colors[state] = color_palette[i]
+        #return colors
+
+        colors = {'S': sns.xkcd_rgb['denim blue'], 'E':  sns.xkcd_rgb['bright orange'], 'I1': sns.xkcd_rgb['light red'], 'I2': sns.xkcd_rgb['pinkish red'], 'I3': sns.xkcd_rgb['deep pink'], 'R': sns.xkcd_rgb['medium green'], 'D': sns.xkcd_rgb['black']}
+        colors['I_total'] = 'gray'  # need to add states from finalize
         return colors
 
 
