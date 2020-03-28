@@ -6,6 +6,8 @@ Copyright: 2020, [Gerrit Großmann](https://mosi.uni-saarland.de/people/gerrit/)
 
 Version: 0.1 (Please note that this is proof-of-concept code in a very early development stage.)
 
+**Caveat lector**: This is an academic model, do not use academic models as a basis for political decision-making.
+
 ## Overview
 ------------------
 Stochastic (Monte-Carlo) simulation of the of Covid-19 pandemic (of the SARS-CoV-2 virus) on complex networks (contact graphs).

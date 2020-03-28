@@ -90,7 +90,7 @@ class Corona:
     # find the excellent online tool at: https://alhill.shinyapps.io/COVID19seir/
     # conversion to a networked model based on scaling infection rate based on the mean degree of the network
 
-    def __init__(self, scale_by_mean_degree = True):
+    def __init__(self, scale_by_mean_degree = True, init_exposed = None):
 
         b1 = 0.500 # / number of nodes      # infection rate from i1
         b2 = 0.100 # / number of nodes      # infection rate from i2
@@ -115,6 +115,7 @@ class Corona:
         self.i2_to_r = g2
         self.i3_to_r = g3
         self.scale_by_mean_degree = scale_by_mean_degree
+        self.init_exposed = init_exposed
 
 
     def states(self):
@@ -133,6 +134,11 @@ class Corona:
 
 
     def get_init_labeling(self, G):
+        if self.init_exposed is not None:
+            init_node_state = {n: 'S' for n in range(G.number_of_nodes())}
+            for exp_node in self.init_exposed:
+                init_node_state[exp_node] = 'E'
+            return init_node_state
         init_node_state = {n: ('E' if random.random() > 0.90 else 'S') for n in range(G.number_of_nodes())}
         return init_node_state
 

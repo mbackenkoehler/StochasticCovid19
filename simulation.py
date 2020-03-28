@@ -191,7 +191,9 @@ if __name__ == "__main__":
 
     G, node_pos = geom_graph()
     # G = nx.grid_2d_graph(20, 20)
-    visualization(G, Corona(), np.linspace(0,50,50), outpath='output_singlerun_geom_viz.pdf', node_pos=node_pos)
+    # Note that visualization is super slow currently
+    # To reduce gif size you might want to use "gifsicle -i output_simulation_movie.gif -O3 --colors 100 -o anim-opt.gif"
+    visualization(G, Corona(init_exposed=[0], scale_by_mean_degree=False), np.linspace(0,120,60), outpath='output_singlerun_geom_viz.pdf', node_pos=node_pos)
 
     corona_model = Corona()
     time_point_samples =  np.linspace(0,100,100)

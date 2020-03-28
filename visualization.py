@@ -8,10 +8,10 @@ import glob
 
 # nice grapkh for visuals
 def geom_graph():
-    radius = 0.05
+    radius = 0.07
     seed = 42
     for _ in range(1000):
-        G = nx.random_geometric_graph(400, radius, seed=seed)
+        G = nx.random_geometric_graph(350, radius, seed=seed)
         node_num = G.number_of_nodes()
         pos = nx.get_node_attributes(G, 'pos')
         node_pos = [(pos[i][0], pos[i][1]) for i in range(node_num)]
