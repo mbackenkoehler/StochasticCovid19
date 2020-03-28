@@ -90,7 +90,7 @@ class Corona:
     # find the excellent online tool at: https://alhill.shinyapps.io/COVID19seir/
     # conversion to a networked model based on scaling infection rate based on the mean degree of the network
 
-    def __init__(self, scale_by_mean_degree = True, init_exposed = None):
+    def __init__(self, scale_by_mean_degree = True, init_exposed = None, number_of_units=1):
 
         b1 = 0.500 # / number of nodes      # infection rate from i1
         b2 = 0.100 # / number of nodes      # infection rate from i2
@@ -116,6 +116,8 @@ class Corona:
         self.i3_to_r = g3
         self.scale_by_mean_degree = scale_by_mean_degree
         self.init_exposed = init_exposed
+
+        self.number_of_units=number_of_units # only relevant for deterministic ODE
 
 
     def states(self):
@@ -231,10 +233,9 @@ class Corona:
     # ODE
 
     # has to be a vector in the order of models.states()
-    def ode_init(self, number_of_units=1):
+    def ode_init(self):
         init = [0.95, 0.05, 0.0, 0.0, 0.0, 0.0, 0.0]
-        init = [x/number_of_units for x in init]
-        self.number_of_units = number_of_units
+        init = [x*self.number_of_units for x in init]
         return init
 
     def ode_func(self, population_vector, t):
@@ -246,9 +247,9 @@ class Corona:
         r = population_vector[5]
         d = population_vector[6]
 
-        s_grad = -(self.s_to_e_dueto_i1/self.number_of_units*i1+self.s_to_e_dueto_i2/self.number_of_units*i3+self.s_to_e_dueto_i3/self.number_of_units*i3)*s
-        e_grad = (self.s_to_e_dueto_i1/self.number_of_units*i1+self.s_to_e_dueto_i2/self.number_of_units*i3+self.s_to_e_dueto_i3/self.number_of_units*i3)*s - self.e_to_i1/self.number_of_units * e
-        i1_grad = self.e_to_i1/self.number_of_units * e - (self.i1_to_r + self.i1_to_i2) * i1
+        s_grad = -(self.s_to_e_dueto_i1/self.number_of_units*i1+self.s_to_e_dueto_i2/self.number_of_units*i3+self.s_to_e_dueto_i3/self.number_of_units*i3) * s
+        e_grad = (self.s_to_e_dueto_i1/self.number_of_units*i1+self.s_to_e_dueto_i2/self.number_of_units*i3+self.s_to_e_dueto_i3/self.number_of_units*i3) * s - self.e_to_i1 * e
+        i1_grad = self.e_to_i1 * e - (self.i1_to_r + self.i1_to_i2) * i1
         i2_grad = self.i1_to_i2 * i1 - (self.i2_to_r + self.i2_to_i3) * i2
         i3_grad = self.i2_to_i3 * i2 - (self.i3_to_r + self.i3_to_d) * i3
         r_grad = self.i1_to_r * i1 + self.i2_to_r * i2 + self.i3_to_r * i3

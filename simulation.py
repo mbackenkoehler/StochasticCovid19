@@ -203,7 +203,7 @@ def solve_ode(model, time_point_samples, outpath = 'output/output_ode.pdf'):
             c = None
         plt.plot(time_point_samples, sol_i, label=state, c=c, alpha=0.8, lw=2)
     plt.legend(bbox_to_anchor=(1.04,1), loc="upper left")
-    plt.ylim([0,1])
+    plt.ylim([0,model.number_of_units])
     plt.xlim([0, time_point_samples[-1]])
     plt.savefig(outpath, bbox_inches="tight")
     plt.show(block=False)
@@ -215,6 +215,9 @@ if __name__ == "__main__":
     os.system('mkdir output/')
 
     solve_ode(Corona(),  np.linspace(0,100,500))
+    solve_ode(Corona(number_of_units=100), np.linspace(0, 100, 500), outpath='output/output_ode100.pdf')
+
+    z=z/0
 
     #cv = get_critical_value(G)
     #sis_model = SISmodel(infection_rate=cv*3)
