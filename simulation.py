@@ -203,5 +203,5 @@ if __name__ == "__main__":
     print('final mean complete:', final_mean(df, corona_model))
     df = simulate(nx.erdos_renyi_graph(n=100, p=0.1), corona_model, time_point_samples, outpath='output_erdosrenyi.pdf')
     print('final mean erdos renyi:', final_mean(df, corona_model))
-    df = simulate(G_geom,  Corona(init_exposed=[0], scale_by_mean_degree=False), time_point_samples, outpath='output_geom.svg', num_runs=50)
+    df = simulate(G_geom,  Corona(init_exposed=[0], scale_by_mean_degree=False), time_point_samples, outpath='output_geom.jpg', num_runs=50)
     print('final mean geometric network:', final_mean(df, corona_model))
