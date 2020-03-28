@@ -217,7 +217,7 @@ if __name__ == "__main__":
     solve_ode(Corona(),  np.linspace(0,100,500))
     solve_ode(Corona(number_of_units=100), np.linspace(0, 100, 500), outpath='output/output_ode100.pdf')
 
-    z=z/0
+    #z=z/0  # stop here
 
     #cv = get_critical_value(G)
     #sis_model = SISmodel(infection_rate=cv*3)
