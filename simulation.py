@@ -189,11 +189,11 @@ if __name__ == "__main__":
     #sis_model = SISmodel(infection_rate=cv*3)
     #sir_model = SIRmodel(infection_rate=cv * 7)
 
-    G, node_pos = geom_graph()
+    G_geom, node_pos = geom_graph()
     # G = nx.grid_2d_graph(20, 20)
     # Note that visualization is super slow currently
     # To reduce gif size you might want to use "gifsicle -i output_simulation_movie.gif -O3 --colors 100 -o anim-opt.gif"
-    visualization(G, Corona(init_exposed=[0], scale_by_mean_degree=False), np.linspace(0,120,60), outpath='output_singlerun_geom_viz.pdf', node_pos=node_pos)
+    #visualization(G_geom, Corona(init_exposed=[0], scale_by_mean_degree=False), np.linspace(0,120,60), outpath='output_singlerun_geom_viz.pdf', node_pos=node_pos)
 
     corona_model = Corona()
     time_point_samples =  np.linspace(0,100,100)
@@ -203,3 +203,5 @@ if __name__ == "__main__":
     print('final mean complete:', final_mean(df, corona_model))
     df = simulate(nx.erdos_renyi_graph(n=100, p=0.1), corona_model, time_point_samples, outpath='output_erdosrenyi.pdf')
     print('final mean erdos renyi:', final_mean(df, corona_model))
+    df = simulate(G_geom,  Corona(init_exposed=[0], scale_by_mean_degree=False), time_point_samples, outpath='output_geom.pdf')
+    print('final mean geometric network:', final_mean(df, corona_model))
