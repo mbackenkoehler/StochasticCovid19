@@ -5,7 +5,8 @@ __pycache__/
 .idea
 .idea/
 
-
+output/
+output/*
 
 .ipynb_checkpoints
 .ipynb_checkpoints/

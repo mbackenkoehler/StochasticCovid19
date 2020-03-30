@@ -123,7 +123,7 @@ def simulation_run(G, model, time_point_samples, at_leat_one=False, max_steps=No
         # perform interventions
         if interventions is not None:
             for intervention in interventions:
-                intervention.perform_intervention(G, model, current_event, global_clock, time_point_samples, heapq, node_counter)
+                intervention.perform_intervention(G, model, current_event, global_clock, time_point_samples, event_queue, node_counter)
 
     return y_values
 
