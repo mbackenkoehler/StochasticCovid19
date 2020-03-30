@@ -208,15 +208,7 @@ class CoronaHill(SpreadingModel):
         return node_state_counts
 
     def generate_event(self, G, src_node, global_clock):
-        # only compute once mean degree
-        # Important: update this when changing the graph structure!!
-        # e.g. set model.mean_degree = None
-        try:
-            mean_degree = float(self.mean_degree)  # the float operator raises error when set to none => recompute
-        except:
-            mean_degree = (2 * len(G.edges())) / G.number_of_nodes()
-            self.mean_degree = mean_degree
-
+        mean_degree = (2 * len(G.edges())) / G.number_of_nodes()
         if G.nodes[src_node]['state'] == 'S':
             new_state = 'E'
             neighbors = G.neighbors(src_node)
