@@ -27,7 +27,9 @@ from tqdm import tqdm
 #
 
 from spreading_models import *
-
+RUN_NUM = 10
+if 'TRAVIS' in os.environ: # dont put too much load on travis (only relevant for testing)
+    RUN_NUM = 3
 
 #
 # Simulation Code
@@ -116,7 +118,9 @@ def simulation_run(G, model, time_point_samples, at_leat_one=False, max_steps=No
 
 
 
-def simulate(G, model, time_point_samples, num_runs=30, outpath = 'output/output.pdf', max_steps=None, node_wise_matrix=None):
+def simulate(G, model, time_point_samples, num_runs=None, outpath = 'output/output.pdf', max_steps=None, node_wise_matrix=None):
+    if num_runs is None:
+        num_runs = RUN_NUM
     G = nx.convert_node_labels_to_integers(G)
     init_node_state = model.get_init_labeling(G)
     pbar = tqdm(total=num_runs)
@@ -158,7 +162,7 @@ def lineplot(df, model, time_point_samples, outpath):
     plt.clf()
     palette = None
     try:
-        palette = model.get_colors()
+        palette = model.colors()
     except:
         pass
     sns.lineplot(x="Time", y="Fraction", hue='State', data=df, ci=95, palette = palette)
@@ -188,7 +192,7 @@ def visualization(G, model, time_point_samples, outpath = 'vit_out.gif', node_po
     simulate(G, model, time_point_samples, num_runs=1, outpath = outpath, node_wise_matrix=node_wise_matrix)
     viz_simulate(G, time_point_samples, node_wise_matrix, model, node_pos=node_pos)
 
-def solve_ode(model, time_point_samples, outpath = 'output/output_ode.pdf'):
+def solve_ode(model, time_point_samples, outpath = 'output_gif/output_ode.pdf'):
     plt.clf()
     from scipy.integrate import odeint
     init = model.ode_init()
@@ -198,12 +202,12 @@ def solve_ode(model, time_point_samples, outpath = 'output/output_ode.pdf'):
     for state_i, state in enumerate(model.states()):
         sol_i = sol[:,state_i]
         try:
-            c = model.get_colors()[state]
+            c = model.colors()[state]
         except:
             c = None
         plt.plot(time_point_samples, sol_i, label=state, c=c, alpha=0.8, lw=2)
     plt.legend(bbox_to_anchor=(1.04,1), loc="upper left")
-    plt.ylim([0,model.number_of_units])
+    plt.ylim([0, model.get_number_of_units()])
     plt.xlim([0, time_point_samples[-1]])
     plt.savefig(outpath, bbox_inches="tight")
     plt.show(block=False)
@@ -213,29 +217,85 @@ def solve_ode(model, time_point_samples, outpath = 'output/output_ode.pdf'):
 
 if __name__ == "__main__":
     os.system('mkdir output/')
+    time_point_samples =  np.linspace(0,100,100)
 
-    solve_ode(Corona(),  np.linspace(0,100,500))
-    solve_ode(Corona(number_of_units=100), np.linspace(0, 100, 500), outpath='output/output_ode100.pdf')
+    #
+    # Test SIS Model
+    #
+    G = nx.grid_2d_graph(5,5)
+    cv = get_critical_value(G)  # find interesting infection rate
+    sis_model = SISmodel(infection_rate=1.0)
+    #solve_ode(sis_model,  time_point_samples, outpath = 'output/output_ode_sis.pdf')   #not implemented
+    df = simulate(G, sis_model, time_point_samples, outpath = 'output/output_sis_grid.pdf')
+    print('final mean sis grid:', final_mean(df, sis_model))
 
-    #z=z/0  # stop here
 
-    #cv = get_critical_value(G)
-    #sis_model = SISmodel(infection_rate=cv*3)
-    #sir_model = SIRmodel(infection_rate=cv * 7)
+    #
+    # Test SIR Model
+    #
+    sir_model = SIRmodel(infection_rate=0.5)
+    #solve_ode(sir_model, time_point_samples, outpath = 'output/output_ode_sir.pdf')  # not implemented
+    df = simulate(nx.grid_2d_graph(5,5), sis_model, time_point_samples, outpath = 'output/output_sir_grid.pdf')
+    print('final mean sir grid:', final_mean(df, sis_model))
 
+
+    #
+    # Test Corona Model on Grid Network
+    #
+    corona_model = CoronaHill()
+    solve_ode(corona_model, time_point_samples, outpath = 'output/output_ode_corona.pdf')
+    df = simulate(nx.grid_2d_graph(10,10), corona_model, time_point_samples, outpath = 'output/output_corona_grid.pdf')
+    print('final mean grid:', final_mean(df, corona_model))
+
+
+    #
+    # Test Corona Model on Geometric Network
+    #
     G_geom, node_pos = geom_graph()
-    # G = nx.grid_2d_graph(20, 20)
+    corona_model = CoronaHill()
+    df = simulate(G_geom, corona_model, time_point_samples, outpath = 'output/output_corona_geom.pdf')
+    print('final mean geom:', final_mean(df, corona_model))
+
+
+    #
+    # Test SuperClass (gives nonsense data)
+    #
+    spr_model = SpreadingModel()
+    df = simulate(nx.grid_2d_graph(3,3), spr_model, time_point_samples, outpath = 'output/output_superclass_grid.pdf')
+    print('final mean superclass grid:', final_mean(df, spr_model))
+    #solve_ode(spr_model, time_point_samples, outpath = 'output/output_ode_superclass.pdf')
+
+
+    #
+    # Create Gif with Corona Model
+    #
     # Note that visualization is super slow currently
     # To reduce gif size you might want to use "gifsicle -i output_simulation_movie.gif -O3 --colors 100 -o anim-opt.gif"
-    #visualization(G_geom, Corona(init_exposed=[0], scale_by_mean_degree=False), np.linspace(0,120,60), outpath='output_singlerun_geom_viz.pdf', node_pos=node_pos)
+    os.system('mkdir output_gif/')
+    G_geom, node_pos = geom_graph()
+    visualization(G_geom, CoronaHill(init_exposed=[0], scale_by_mean_degree=False), np.linspace(0,120,60), outpath='output_gif/output_singlerun_geom_viz.pdf', node_pos=node_pos)
 
-    corona_model = Corona()
-    time_point_samples =  np.linspace(0,100,100)
-    df = simulate(nx.grid_2d_graph(10,10), corona_model, time_point_samples, outpath = 'output/output_grid.pdf')
-    print('final mean grid:', final_mean(df, corona_model))
-    df = simulate(nx.complete_graph(100), corona_model, time_point_samples, outpath='output/output_complete.pdf')
+    #
+    # Create Gif with SIS Model
+    #
+    # Note that visualization is super slow currently
+    # To reduce gif size you might want to use "gifsicle -i output_simulation_movie.gif -O3 --colors 100 -o anim-opt.gif"
+    G_geom, node_pos = geom_graph(node_num=100)
+    visualization(G_geom, SISmodel(infection_rate=0.5), np.linspace(0,20,60), outpath='output_gif/output_singlerun_geom_sis_viz.pdf', node_pos=node_pos)
+
+
+    #
+    # Test Corona Model on Complete Network
+    #
+    corona_model = CoronaHill()
+    df = simulate(nx.complete_graph(100), corona_model, time_point_samples, outpath = 'output/output_corona_complete.pdf')
     print('final mean complete:', final_mean(df, corona_model))
-    df = simulate(nx.erdos_renyi_graph(n=100, p=0.1), corona_model, time_point_samples, outpath='output/output_erdosrenyi.pdf')
-    print('final mean erdos renyi:', final_mean(df, corona_model))
-    df = simulate(G_geom,  Corona(init_exposed=[0], scale_by_mean_degree=False), time_point_samples, outpath='output/output_geom.jpg', num_runs=50)
-    print('final mean geometric network:', final_mean(df, corona_model))
+
+
+    #
+    # Test Corona Model on Erdos Renyi Network
+    #
+    corona_model = CoronaHill()
+    df = simulate(nx.erdos_renyi_graph(n=100, p=0.05), corona_model, time_point_samples, outpath = 'output/output_corona_erdosrenyi.pdf')
+    print('final mean erdosrenyi:', final_mean(df, corona_model))
+

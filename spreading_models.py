@@ -16,8 +16,63 @@ import heapq
 import copy
 
 
-# model has to have states(), get_init_labeling(), and next_event(self, G, src_node, global_clock) method
-class SISmodel:
+########################################################
+# Superclass for any spreading model
+########################################################
+
+class SpreadingModel:
+    # you probably do not want to touch this class
+    def __init__(self, number_of_units=1):
+        self.number_of_units = number_of_units # only relevant for deterministic solution
+        pass
+
+    def states(self):
+        return ['I', 'S']
+
+    def get_number_of_units(self):
+        try:
+            return self.number_of_units
+        except:
+            return 1.0
+
+    def colors(self):
+        palette = sns.color_palette("muted", len(self.states()))
+        colors = {s: list(palette[i]) for i, s in enumerate(self.states())}
+        return colors
+
+    def get_init_labeling(self, G):
+        return {n: random.choice(self.states()) for n in range(G.number_of_nodes())}
+
+    # wrapper (logic in generate event)
+    # this method is the important one in the super-class, do not overwrite it
+    def next_event(self, G, src_node, global_clock):
+        event_id = G.nodes[src_node]['event_id']
+        event_id += 1
+        new_time, new_state = self.generate_event(G, src_node, global_clock)
+        G.nodes[src_node]['event_id'] = event_id
+        return new_time, src_node, new_state, event_id
+
+    def generate_event(self, G, src_node, global_clock):
+        return global_clock + random.random(), random.choice(self.states())
+
+    def aggregate(self, node_state_counts):
+        return node_state_counts
+
+    # for the deterministic solution
+    def ode_init(self):
+        raise NotImplementedError
+        #return [(1.0/len(self.states()))*self.get_number_of_units() for _ in self.states()]
+
+    def ode_func(self, population_vector, t):
+        raise NotImplementedError
+        #return [0.001*i for i in range(len(self.states()))]
+
+
+########################################################
+# Classical SIS Model
+########################################################
+
+class SISmodel(SpreadingModel):
     def __init__(self, infection_rate):
         self.infection_rate = infection_rate
 
@@ -28,10 +83,7 @@ class SISmodel:
         init_node_state = {n: ('I' if random.random() > 0.9 else 'S') for n in range(G.number_of_nodes())}
         return init_node_state
 
-    def next_event(self, G, src_node, global_clock):
-        event_id = G.nodes[src_node]['event_id']
-        event_id += 1
-
+    def generate_event(self, G, src_node, global_clock):
         if G.nodes[src_node]['state'] == 'I':
             new_state = 'S'
             fire_time = -np.log(random.random())  # recov-rate is alsways 1
@@ -44,13 +96,15 @@ class SISmodel:
                 node_rate = inf_neighbors * self.infection_rate
                 fire_time = -np.log(random.random()) / node_rate
 
-        G.nodes[src_node]['event_id'] = event_id
         new_time = global_clock + fire_time
-        return new_time, src_node, new_state, event_id
+        return new_time, new_state
 
 
+########################################################
+# Classical SIR Model
+########################################################
 
-class SIRmodel:
+class SIRmodel(SpreadingModel):
     def __init__(self, infection_rate):
         self.infection_rate = infection_rate
 
@@ -61,10 +115,7 @@ class SIRmodel:
         init_node_state = {n: ('I' if random.random() > 0.9 else 'S') for n in range(G.number_of_nodes())}
         return init_node_state
 
-    def next_event(self, G, src_node, global_clock):
-        event_id = G.nodes[src_node]['event_id']
-        event_id += 1
-
+    def generate_event(self, G, src_node, global_clock):
         if G.nodes[src_node]['state'] == 'I':
             new_state = 'R'
             fire_time = -np.log(random.random())
@@ -80,17 +131,19 @@ class SIRmodel:
             new_state = 'R'
             fire_time = 10000000 + random.random()
 
-        G.nodes[src_node]['event_id'] = event_id
         new_time = global_clock + fire_time
-        return new_time, src_node, new_state, event_id
+        return new_time, new_state
 
 
-class Corona:
-    # created based on the model of Dr. Alison Hill
+########################################################
+# Corona Model (inspired by Alison Hill)
+########################################################
+
+class CoronaHill(SpreadingModel):
     # find the excellent online tool at: https://alhill.shinyapps.io/COVID19seir/
     # conversion to a networked model based on scaling infection rate based on the mean degree of the network
 
-    def __init__(self, scale_by_mean_degree = True, init_exposed = None, number_of_units=1):
+    def __init__(self, scale_by_mean_degree = True, init_exposed = None, number_of_units=1, scale_inf_rate = 1):
 
         b1 = 0.500 # / number of nodes      # infection rate from i1
         b2 = 0.100 # / number of nodes      # infection rate from i2
@@ -104,9 +157,9 @@ class Corona:
         u = 0.050   # i3 to death
 
 
-        self.s_to_e_dueto_i1 = b1
-        self.s_to_e_dueto_i2 = b2
-        self.s_to_e_dueto_i3 = b3
+        self.s_to_e_dueto_i1 = b1*scale_inf_rate
+        self.s_to_e_dueto_i2 = b2*scale_inf_rate
+        self.s_to_e_dueto_i3 = b3*scale_inf_rate
         self.e_to_i1 = a
         self.i1_to_i2 = p1
         self.i2_to_i3 = p2
@@ -119,21 +172,16 @@ class Corona:
 
         self.number_of_units=number_of_units # only relevant for deterministic ODE
 
+    x = 3
+
 
     def states(self):
         return ['S', 'E', 'I1', 'I2', 'I3', 'R', 'D']
 
-    def get_colors(self):
-        #color_palette = sns.color_palette("muted", len(self.states()))
-        #colors = dict()
-        #for i, state in self.states():
-        #    colors[state] = color_palette[i]
-        #return colors
-
+    def colors(self):
         colors = {'S': sns.xkcd_rgb['denim blue'], 'E':  sns.xkcd_rgb['bright orange'], 'I1': sns.xkcd_rgb['light red'], 'I2': sns.xkcd_rgb['pinkish red'], 'I3': sns.xkcd_rgb['deep pink'], 'R': sns.xkcd_rgb['medium green'], 'D': sns.xkcd_rgb['black']}
         colors['I_total'] = 'gray'  # need to add states from finalize
         return colors
-
 
     def get_init_labeling(self, G):
         if self.init_exposed is not None:
@@ -144,8 +192,8 @@ class Corona:
         init_node_state = {n: ('E' if random.random() > 0.90 else 'S') for n in range(G.number_of_nodes())}
         return init_node_state
 
-    def mean_degree(self, G):
-        return (2*len(G.edges()))/G.number_of_nodes()
+    #def mean_degree(self, G):
+    #    return (2*len(G.edges()))/G.number_of_nodes()
 
     def aggregate(self, node_state_counts):
         node_state_counts['I_total'] = [0 for _ in range(len(node_state_counts['I1']))]
@@ -158,9 +206,15 @@ class Corona:
         return node_state_counts
 
 
-    def next_event(self, G, src_node, global_clock):
-        event_id = G.nodes[src_node]['event_id']
-        event_id += 1
+    def generate_event(self, G, src_node, global_clock):
+        # only compute once mean degree
+        # Important: update this when changing the graph structure!!
+        # e.g. set model.mean_degree = None
+        try:
+            mean_degree = float(self.mean_degree)   # the float operator raises error when set to none => recompute
+        except:
+            mean_degree = (2*len(G.edges()))/G.number_of_nodes()
+            self.mean_degree = mean_degree
 
         if G.nodes[src_node]['state'] == 'S':
             new_state = 'E'
@@ -173,7 +227,7 @@ class Corona:
             else:
                 node_rate = count_i1 * self.s_to_e_dueto_i1 + count_i2 * self.s_to_e_dueto_i2  + count_i3 * self.s_to_e_dueto_i3
                 if self.scale_by_mean_degree:
-                    node_rate /= self.mean_degree(G)
+                    node_rate /= mean_degree
                 fire_time = -np.log(random.random()) / node_rate
 
         elif G.nodes[src_node]['state'] == 'E':
@@ -225,9 +279,8 @@ class Corona:
             print('no matching state')
             assert(False)
 
-        G.nodes[src_node]['event_id'] = event_id
         new_time = global_clock + fire_time
-        return new_time, src_node, new_state, event_id
+        return new_time, new_state
 
 
     # ODE
