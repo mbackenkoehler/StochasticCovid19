@@ -49,7 +49,8 @@ def get_critical_value(contact_network):
     return beta
 
 
-def simulation_run(G, model, time_point_samples, at_leat_one=False, max_steps=None, node_wise_matrix=None, interventions=None):
+def simulation_run(G, model, time_point_samples, at_leat_one=False, max_steps=None, node_wise_matrix=None,
+                   interventions=None):
     global_clock = 0.0
     step_i = 0
     time_point_sample_index = 0
@@ -79,6 +80,16 @@ def simulation_run(G, model, time_point_samples, at_leat_one=False, max_steps=No
 
         # pop next event
         current_event = heapq.heappop(event_queue)
+
+        # check if event is intervention event or regular event
+        try:  # TODO make this nicer
+            new_time, intervention = current_event  # only works if intervention event
+            global_clock = new_time
+            intervention.perform_intervention(G, model, current_event, global_clock, time_point_samples, event_queue,
+                                              node_counter)
+        except:
+            pass
+
         new_time, src_node, new_state, event_id = current_event
         global_clock = new_time
 
@@ -123,7 +134,8 @@ def simulation_run(G, model, time_point_samples, at_leat_one=False, max_steps=No
         # perform interventions
         if interventions is not None:
             for intervention in interventions:
-                intervention.perform_intervention(G, model, current_event, global_clock, time_point_samples, event_queue, node_counter)
+                intervention.perform_intervention(G, model, current_event, global_clock, time_point_samples,
+                                                  event_queue, node_counter)
 
     return y_values
 
@@ -231,6 +243,7 @@ def solve_ode(model, time_point_samples, outpath='output_gif/output_ode.pdf'):
     print('final values of ODE: ', {model.states()[i]: sol[-1, i] for i in range(len(model.states()))})
     return sol
 
+
 if __name__ == "__main__":
     os.system('mkdir output/')
     time_point_samples = np.linspace(0, 100, 100)
@@ -284,8 +297,9 @@ if __name__ == "__main__":
     # To reduce gif size you might want to use "gifsicle -i output_simulation_movie.gif -O3 --colors 100 -o anim-opt.gif"
     os.system('mkdir output_gif/')
     G_geom, node_pos = geom_graph()
-    visualization(G_geom, CoronaHill(init_exposed=[0], scale_by_mean_degree=False), np.linspace(0, 120, 60),
-                  outpath='output_gif/output_singlerun_geom_viz.pdf', node_pos=node_pos)
+    if 'TRAVIS' not in os.environ:  # dont test this on travis
+        visualization(G_geom, CoronaHill(init_exposed=[0], scale_by_mean_degree=False), np.linspace(0, 120, 60),
+                      outpath='output_gif/output_singlerun_geom_viz.pdf', node_pos=node_pos)
 
     #
     # Create Gif with SIS Model
@@ -293,8 +307,9 @@ if __name__ == "__main__":
     # Note that visualization is super slow currently
     # To reduce gif size you might want to use "gifsicle -i output_simulation_movie.gif -O3 --colors 100 -o anim-opt.gif"
     G_geom, node_pos = geom_graph(node_num=100)
-    visualization(G_geom, SISmodel(infection_rate=0.5), np.linspace(0, 20, 60),
-                  outpath='output_gif/output_singlerun_geom_sis_viz.pdf', node_pos=node_pos)
+    if 'TRAVIS' not in os.environ:  # dont test this on travis
+        visualization(G_geom, SISmodel(infection_rate=0.2), np.linspace(0, 5, 60),
+                      outpath='output_gif/output_singlerun_geom_sis_viz.pdf', node_pos=node_pos)
 
     #
     # Test Corona Model on Complete Network
@@ -315,9 +330,11 @@ if __name__ == "__main__":
     # Test SIR Model with random reovery intervention
     #
     sir_model = SIRmodel(infection_rate=1.3)
-    df = simulate(nx.grid_2d_graph(10, 10), sir_model, time_point_samples, outpath='output/output_sir_grid_wointervent.pdf', num_runs = 100)
+    df = simulate(nx.grid_2d_graph(10, 10), sir_model, time_point_samples,
+                  outpath='output/output_sir_grid_wointervent.pdf', num_runs=100)
     print('final mean sir grid:', final_mean(df, sir_model))
     sir_model = SIRmodel(infection_rate=1.3)
     rec_inv = RandomRecover()
-    df = simulate(nx.grid_2d_graph(10, 10), sir_model, time_point_samples, outpath='output/output_sir_grid_withintervent.pdf', interventions=rec_inv, num_runs = 100)
+    df = simulate(nx.grid_2d_graph(10, 10), sir_model, time_point_samples,
+                  outpath='output/output_sir_grid_withintervent.pdf', interventions=rec_inv, num_runs=100)
     print('final mean sir grid random recovery:', final_mean(df, sir_model))
