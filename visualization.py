@@ -9,51 +9,6 @@ import random
 
 
 ########################################################
-# Random graph models
-########################################################
-
-# nice grapkh for visuals
-def geom_graph(node_num=350):
-    radius = 0.07
-    seed = 42
-    for _ in range(1000):
-        G = nx.random_geometric_graph(node_num, radius, seed=seed)
-        node_num = G.number_of_nodes()
-        pos = nx.get_node_attributes(G, 'pos')
-        node_pos = [(pos[i][0], pos[i][1]) for i in range(node_num)]
-        G = nx.convert_node_labels_to_integers(G)
-        edges = [e for e in G.edges]
-        if nx.is_connected(G):
-            return G, node_pos
-        radius *= 1.1
-        seed += 1
-    print('failed graph generation')
-
-
-def fuzzy_geom_graph(size, radius, deg, ret_coords=True, force_connected=True):
-    for _ in range(1000):
-        # sample coordinates
-        x, y = coords = np.random.rand(2, size) / radius
-
-        # build the adjacency matrix
-        adj = np.zeros((size, size)).astype(np.bool)
-        for i, (xi, yi, di) in enumerate(zip(x, y, deg)):
-            # sample neighbors based on euclidian distance
-            p = np.exp(-np.sqrt((xi - x) ** 2 + (yi - y) ** 2))
-            other_nodes = [k for k in range(size) if k != i]
-            p = p[other_nodes]
-            p /= p.sum()
-            neighbors = np.random.choice(other_nodes, size=di, replace=False, p=p)
-            adj[i, neighbors] = True
-        adj |= adj.T
-
-        G = nx.from_numpy_array(adj)
-        if not force_connected or nx.is_connected(G):
-            return G, coords.T
-    print('failed graph generation')
-
-
-########################################################
 # Visualizaion code
 ########################################################
 

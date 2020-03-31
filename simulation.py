@@ -20,7 +20,8 @@ import collections
 from scipy.linalg import expm
 import heapq
 import copy
-from visualization import viz_simulate, geom_graph, fuzzy_geom_graph
+from visualization import viz_simulate
+from generate_random_graphs import geom_graph, fuzzy_geom_graph, power_law_graph
 from tqdm import tqdm
 
 #
@@ -252,13 +253,20 @@ if __name__ == "__main__":
     time_point_samples = np.linspace(0, 100, 100)
 
     #
-    # Test Corona-Lourenco Model
+    # Test Corona-Lourenco Model on Complete graph
     #
     coronaLor_model = CoronaLourenco()
     # solve_ode(sir_model, time_point_samples, outpath = 'output/output_ode_sir.pdf')  # not implemented
     df = simulate(nx.complete_graph(100), coronaLor_model, np.linspace(0, 50.0, 100), outpath='output/output_coronaLor_model_complete.pdf', num_runs=100)
     print('final mean CL complete:', final_mean(df, coronaLor_model))
 
+    #
+    # Test Corona-Lourenco Model on Power-law graph
+    #
+    coronaLor_model = CoronaLourenco()
+    G, _ = power_law_graph(100)
+    df = simulate(G, coronaLor_model, np.linspace(0, 50.0, 100), outpath='output/output_coronaLor_model_powerlaw.pdf', num_runs=100)
+    print('final mean CL power law:', final_mean(df, coronaLor_model))
 
     #
     # Test SIS Model
