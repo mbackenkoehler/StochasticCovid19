@@ -26,6 +26,25 @@ def geom_graph(node_num=350):
     print('failed graph generation')
 
 
+def fuzzy_geom_graph(size, radius, deg, ret_coords=True):
+    # sample coordinates
+    x, y = coords = np.random.rand(2, size) / radius
+
+    # build the adjacency matrix
+    adj = np.zeros((size,size)).astype(np.bool)
+    for i, (xi, yi, di) in enumerate(zip(x, y, deg)):
+        # sample neighbors based on euclidian distance
+        p = np.exp(-np.sqrt((xi - x) ** 2 + (yi - y) ** 2))
+        other_nodes = [k for k in range(size) if k != i]
+        p = p[other_nodes]
+        p /= p.sum()
+        neighbors = np.random.choice(other_nodes, size=di, replace=False, p=p)
+        adj[i, neighbors] = True
+    adj |= adj.T
+
+    return nx.from_numpy_array(adj), coords.T
+
+
 def viz_simulate(G, time_points, storage, model, node_pos=None, outpath='output_simulation_NUM.jpg'):
     os.system('mkdir output_gif')  # might be redundant #TODO fix paths
     rand_id = str(random.choice(range(1000000)))
