@@ -52,7 +52,12 @@ class SpreadingModel:
         event_id += 1
         new_time, new_state = self.generate_event(G, src_node, global_clock)
         G.nodes[src_node]['event_id'] = event_id
-        return new_time, src_node, new_state, event_id
+
+        # build event
+        event_type = 'model'
+        event_content = (src_node, new_state, event_id)
+        event = (new_time, event_type, event_content)
+        return event
 
     def generate_event(self, G, src_node, global_clock):
         return global_clock + random.random(), random.choice(self.states())
@@ -85,6 +90,9 @@ class SISmodel(SpreadingModel):
         init_node_state = {n: ('I' if random.random() > 0.9 else 'S') for n in range(G.number_of_nodes())}
         return init_node_state
 
+    def colors(self):
+        return {'S': sns.xkcd_rgb['denim blue'], 'I': sns.xkcd_rgb['pinkish red']}
+
     def generate_event(self, G, src_node, global_clock):
         if G.nodes[src_node]['state'] == 'I':
             new_state = 'S'
@@ -112,6 +120,9 @@ class SIRmodel(SpreadingModel):
 
     def states(self):
         return ['I', 'S', 'R']
+
+    def colors(self):
+        return {'S': sns.xkcd_rgb['denim blue'], 'I': sns.xkcd_rgb['pinkish red'], 'R': sns.xkcd_rgb['medium green']}
 
     def get_init_labeling(self, G):
         init_node_state = {n: ('I' if random.random() > 0.9 else 'S') for n in range(G.number_of_nodes())}
@@ -193,9 +204,6 @@ class CoronaHill(SpreadingModel):
             return init_node_state
         init_node_state = {n: ('E' if random.random() > 0.90 else 'S') for n in range(G.number_of_nodes())}
         return init_node_state
-
-    # def mean_degree(self, G):
-    #    return (2*len(G.edges()))/G.number_of_nodes()
 
     def aggregate(self, node_state_counts):
         node_state_counts['I_total'] = [0 for _ in range(len(node_state_counts['I1']))]

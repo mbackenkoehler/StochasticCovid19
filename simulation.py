@@ -79,19 +79,18 @@ def simulation_run(G, model, time_point_samples, at_leat_one=False, max_steps=No
             return y_values
 
         # pop next event
-        current_event = heapq.heappop(event_queue)
+        current_event =  heapq.heappop(event_queue)
+        new_time, event_type, event_content = current_event
 
-        # check if event is intervention event or regular event
-        try:  # TODO make this nicer
-            new_time, intervention = current_event  # only works if intervention event
-            global_clock = new_time
-            intervention.perform_intervention(G, model, current_event, global_clock, time_point_samples, event_queue,
-                                              node_counter)
-        except:
-            pass
-
-        new_time, src_node, new_state, event_id = current_event
+        # check event type
+        assert(event_type in ['model', 'intervention'])
         global_clock = new_time
+        if event_type == 'model':
+            src_node, new_state, event_id = event_content
+        else:
+            intervention = event_content[0]
+            intervention.perform_intervention(G, model, None, global_clock, time_point_samples, event_queue,
+                                              node_counter)
 
         # store
         while len(x_values) > 0 and global_clock >= x_values[0]:
@@ -104,6 +103,10 @@ def simulation_run(G, model, time_point_samples, at_leat_one=False, max_steps=No
             time_point_sample_index += 1
         if len(x_values) == 0:
             return y_values
+
+        # continue if intervention
+        if event_type == 'intervention':
+            continue
 
         # reject
         if G.nodes[src_node]['event_id'] != event_id:
@@ -308,7 +311,7 @@ if __name__ == "__main__":
     # To reduce gif size you might want to use "gifsicle -i output_simulation_movie.gif -O3 --colors 100 -o anim-opt.gif"
     G_geom, node_pos = geom_graph(node_num=100)
     if 'TRAVIS' not in os.environ:  # dont test this on travis
-        visualization(G_geom, SISmodel(infection_rate=0.2), np.linspace(0, 5, 60),
+        visualization(G_geom, SISmodel(infection_rate=0.4), np.linspace(0, 5, 60),
                       outpath='output_gif/output_singlerun_geom_sis_viz.pdf', node_pos=node_pos)
 
     #
@@ -336,5 +339,14 @@ if __name__ == "__main__":
     sir_model = SIRmodel(infection_rate=1.3)
     rec_inv = RandomRecover()
     df = simulate(nx.grid_2d_graph(10, 10), sir_model, time_point_samples,
-                  outpath='output/output_sir_grid_withintervent.pdf', interventions=rec_inv, num_runs=100)
+                  outpath='output/output_sir_grid_with_randomrecov_intervent.pdf', interventions=rec_inv, num_runs=100)
     print('final mean sir grid random recovery:', final_mean(df, sir_model))
+
+    #
+    # Test SIR Model on grid with random rewire
+    #
+    sir_model = SIRmodel(infection_rate=1.3)
+    rec_inv = RandomRewire()
+    df = simulate(nx.grid_2d_graph(10, 10), sir_model, time_point_samples,
+                  outpath='output/output_sir_grid_with_randomrewire_intervent.pdf', interventions=rec_inv, num_runs=100)
+    print('final mean sir grid random rewire:', final_mean(df, sir_model))

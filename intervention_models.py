@@ -26,6 +26,7 @@ class Intervention:
     def __init__(self):
         pass
 
+    # current event is none if triggered by inrervention event
     def perform_intervention(self, G, model, last_event, global_clock, time_point_samples, event_queue, node_counter):
         # rewrite G inplace!
         pass
