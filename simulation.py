@@ -20,7 +20,7 @@ import collections
 from scipy.linalg import expm
 import heapq
 import copy
-from visualization import viz_simulate, geom_graph
+from visualization import viz_simulate, geom_graph, fuzzy_geom_graph
 from tqdm import tqdm
 
 #
@@ -281,6 +281,19 @@ if __name__ == "__main__":
     corona_model = CoronaHill()
     df = simulate(G_geom, corona_model, time_point_samples, outpath='output/output_corona_geom.pdf')
     print('final mean geom:', final_mean(df, corona_model))
+
+    #
+    # Test Corona Model on Fuzzy Geometric Network
+    #
+    # sample the degree distribution
+    from scipy.stats import powerlaw, poisson
+    # deg = (powerlaw(.004).rvs(size) * size).astype(np.int)
+    size = 350
+    deg = poisson(3).rvs(size)
+    G_geom, node_pos = fuzzy_geom_graph(size, .07/1.69, deg)
+    corona_model = CoronaHill()
+    df = simulate(G_geom, corona_model, time_point_samples, outpath='output/output_corona_geom_fuzzy.pdf')
+    print('final mean fuzzy geom:', final_mean(df, corona_model))
 
     #
     # Test SuperClass (gives nonsense data)
