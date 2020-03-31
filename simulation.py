@@ -321,11 +321,20 @@ if __name__ == "__main__":
     # Create Gif with SIS Model
     #
     # Note that visualization is super slow currently
-    # To reduce gif size you might want to use "gifsicle -i output_simulation_movie.gif -O3 --colors 100 -o anim-opt.gif"
     G_geom, node_pos = geom_graph(node_num=100)
     if 'TRAVIS' not in os.environ:  # dont test this on travis
         visualization(G_geom, SISmodel(infection_rate=0.4), np.linspace(0, 5, 60),
                       outpath='output_gif/output_singlerun_geom_sis_viz.pdf', node_pos=node_pos)
+
+    #
+    # Create Gif with Corona Model on fuzzy geom model
+    #
+    # Note that visualization is super slow currently
+    deg = [1.0 if d == 4 else 0.0 for d in range(101)]
+    G_geom, node_pos = fuzzy_geom_graph(100, .07 / 1.69, deg)
+    if 'TRAVIS' not in os.environ:  # dont test this on travis
+        visualization(G_geom, CoronaHill(init_exposed=[0], scale_by_mean_degree=False), np.linspace(0, 120, 60),
+                      outpath='output_gif/output_singlerun_fuzzygeom_viz.pdf', node_pos=node_pos)
 
     #
     # Test Corona Model on Complete Network
