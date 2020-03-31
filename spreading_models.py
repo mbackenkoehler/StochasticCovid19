@@ -216,7 +216,6 @@ class CoronaHill(SpreadingModel):
         return node_state_counts
 
     def generate_event(self, G, src_node, global_clock):
-        mean_degree = (2 * len(G.edges())) / G.number_of_nodes()
         if G.nodes[src_node]['state'] == 'S':
             new_state = 'E'
             neighbors = G.neighbors(src_node)
@@ -228,6 +227,7 @@ class CoronaHill(SpreadingModel):
             else:
                 node_rate = count_i1 * self.s_to_e_dueto_i1 + count_i2 * self.s_to_e_dueto_i2 + count_i3 * self.s_to_e_dueto_i3
                 if self.scale_by_mean_degree:
+                    mean_degree = (2 * len(G.edges())) / G.number_of_nodes()
                     node_rate /= mean_degree
                 fire_time = -np.log(random.random()) / node_rate
 
@@ -313,3 +313,50 @@ class CoronaHill(SpreadingModel):
         grad = [s_grad, e_grad, i1_grad, i2_grad, i3_grad, r_grad, d_grad]
 
         return grad
+
+
+# Model by José Lourenço et al.
+# (not tested, no deads yet)
+#Oxford model: https://www.medrxiv.org/content/10.1101/2020.03.24.20042291v1.full.pdf
+class CoronaLourenco(SpreadingModel):
+    def __init__(self, scale_by_mean_degree=True):
+
+        self.sigma =  1.0/4.5   # recovery rate
+        self.r_0 = 2.75
+        self.beta = self.sigma * self.r_0   # infection rate
+
+        self.scale_by_mean_degree = scale_by_mean_degree
+
+    def states(self):
+        return ['I', 'S', 'R']
+
+    def colors(self):
+        return {'S': sns.xkcd_rgb['denim blue'], 'I': sns.xkcd_rgb['pinkish red'], 'R': sns.xkcd_rgb['medium green']}
+
+    def get_init_labeling(self, G):
+        init_node_state = {n: ('I' if random.random() > 0.9 else 'S') for n in range(G.number_of_nodes())}
+        return init_node_state
+
+    def generate_event(self, G, src_node, global_clock):
+        if G.nodes[src_node]['state'] == 'I':
+            new_state = 'R'
+            recovery_rate = self.sigma
+            fire_time = -np.log(random.random())/recovery_rate
+        elif G.nodes[src_node]['state'] == 'S':
+            new_state = 'I'
+            inf_neighbors = len([n for n in G.neighbors(src_node) if G.nodes[n]['state'] == 'I'])
+            if inf_neighbors == 0:
+                fire_time = 10000000 + random.random()
+            else:
+                node_rate = inf_neighbors * self.beta
+                if self.scale_by_mean_degree:
+
+                    mean_degree = (2 * len(G.edges())) / G.number_of_nodes()
+                    node_rate /= mean_degree
+                fire_time = -np.log(random.random()) / node_rate
+        else:
+            new_state = 'R'
+            fire_time = 10000000 + random.random()
+
+        new_time = global_clock + fire_time
+        return new_time, new_state

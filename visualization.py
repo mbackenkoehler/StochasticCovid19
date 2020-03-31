@@ -8,6 +8,10 @@ import glob
 import random
 
 
+########################################################
+# Random graph models
+########################################################
+
 # nice grapkh for visuals
 def geom_graph(node_num=350):
     radius = 0.07
@@ -27,7 +31,7 @@ def geom_graph(node_num=350):
 
 
 def fuzzy_geom_graph(size, radius, deg, ret_coords=True, force_connected=True):
-    while True:
+    for _ in range(1000):
         # sample coordinates
         x, y = coords = np.random.rand(2, size) / radius
 
@@ -46,7 +50,12 @@ def fuzzy_geom_graph(size, radius, deg, ret_coords=True, force_connected=True):
         G = nx.from_numpy_array(adj)
         if not force_connected or nx.is_connected(G):
             return G, coords.T
+    print('failed graph generation')
 
+
+########################################################
+# Visualizaion code
+########################################################
 
 def viz_simulate(G, time_points, storage, model, node_pos=None, outpath='output_simulation_NUM.jpg'):
     os.system('mkdir output_gif')  # might be redundant #TODO fix paths

@@ -252,6 +252,15 @@ if __name__ == "__main__":
     time_point_samples = np.linspace(0, 100, 100)
 
     #
+    # Test Corona-Lourenco Model
+    #
+    coronaLor_model = CoronaLourenco()
+    # solve_ode(sir_model, time_point_samples, outpath = 'output/output_ode_sir.pdf')  # not implemented
+    df = simulate(nx.complete_graph(100), coronaLor_model, np.linspace(0, 50.0, 100), outpath='output/output_coronaLor_model_complete.pdf', num_runs=100)
+    print('final mean CL complete:', final_mean(df, coronaLor_model))
+
+
+    #
     # Test SIS Model
     #
     G = nx.grid_2d_graph(5, 5)
@@ -317,23 +326,15 @@ if __name__ == "__main__":
         visualization(G_geom, CoronaHill(init_exposed=[0], scale_by_mean_degree=False), np.linspace(0, 120, 60),
                       outpath='output_gif/output_singlerun_geom_viz.pdf', node_pos=node_pos)
 
-    #
-    # Create Gif with SIS Model
-    #
-    # Note that visualization is super slow currently
-    G_geom, node_pos = geom_graph(node_num=100)
-    if 'TRAVIS' not in os.environ:  # dont test this on travis
-        visualization(G_geom, SISmodel(infection_rate=0.4), np.linspace(0, 5, 60),
-                      outpath='output_gif/output_singlerun_geom_sis_viz.pdf', node_pos=node_pos)
 
     #
-    # Create Gif with Corona Model on fuzzy geom model
+    # Create Gif with SIS Model on fuzzy geom model
     #
     # Note that visualization is super slow currently
-    deg = [4 for _ in range(100)]
-    G_geom, node_pos = fuzzy_geom_graph(100, .07 / 1.69, deg)
+    deg = [5 for _ in range(300)]
+    G_geom, node_pos = fuzzy_geom_graph(300, 0.1, deg)
     if 'TRAVIS' not in os.environ:  # dont test this on travis
-        visualization(G_geom, CoronaHill(init_exposed=[0], scale_by_mean_degree=False), np.linspace(0, 120, 60),
+        visualization(G_geom, SISmodel(infection_rate=0.4), np.linspace(0, 5, 60),
                       outpath='output_gif/output_singlerun_fuzzygeom_viz.pdf', node_pos=node_pos)
 
     #
