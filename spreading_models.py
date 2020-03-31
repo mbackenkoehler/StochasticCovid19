@@ -317,15 +317,16 @@ class CoronaHill(SpreadingModel):
 
 # Model by José Lourenço et al.
 # (not tested, no deads yet)
-#Oxford model: https://www.medrxiv.org/content/10.1101/2020.03.24.20042291v1.full.pdf
+# Oxford model: https://www.medrxiv.org/content/10.1101/2020.03.24.20042291v1.full.pdf
 class CoronaLourenco(SpreadingModel):
-    def __init__(self, scale_by_mean_degree=True):
+    def __init__(self, scale_by_mean_degree=True, number_of_units=1):
 
-        self.sigma =  1.0/4.5   # recovery rate
+        self.sigma = 1.0 / 4.5  # recovery rate
         self.r_0 = 2.75
-        self.beta = self.sigma * self.r_0   # infection rate
+        self.beta = self.sigma * self.r_0  # infection rate
 
         self.scale_by_mean_degree = scale_by_mean_degree
+        self.number_of_units = number_of_units
 
     def states(self):
         return ['I', 'S', 'R']
@@ -341,7 +342,7 @@ class CoronaLourenco(SpreadingModel):
         if G.nodes[src_node]['state'] == 'I':
             new_state = 'R'
             recovery_rate = self.sigma
-            fire_time = -np.log(random.random())/recovery_rate
+            fire_time = -np.log(random.random()) / recovery_rate
         elif G.nodes[src_node]['state'] == 'S':
             new_state = 'I'
             inf_neighbors = len([n for n in G.neighbors(src_node) if G.nodes[n]['state'] == 'I'])
@@ -350,7 +351,6 @@ class CoronaLourenco(SpreadingModel):
             else:
                 node_rate = inf_neighbors * self.beta
                 if self.scale_by_mean_degree:
-
                     mean_degree = (2 * len(G.edges())) / G.number_of_nodes()
                     node_rate /= mean_degree
                 fire_time = -np.log(random.random()) / node_rate
@@ -360,3 +360,22 @@ class CoronaLourenco(SpreadingModel):
 
         new_time = global_clock + fire_time
         return new_time, new_state
+
+    # has to be a vector in the order of models.states()
+    def ode_init(self):
+        init = [0.05, 0.95, 0.0]
+        init = [x * self.number_of_units for x in init]
+        return init
+
+    def ode_func(self, population_vector, t):
+        i = population_vector[0]
+        s = population_vector[1]
+        r = population_vector[2]
+
+        s_grad = -(self.beta / self.number_of_units * i) * s
+        i_grad = (self.beta / self.number_of_units * i) * s - (self.sigma * i)
+        r_grad = self.sigma * i
+
+        grad = [i_grad, s_grad, r_grad]
+
+        return grad

@@ -256,7 +256,7 @@ if __name__ == "__main__":
     # Test Corona-Lourenco Model on Complete graph
     #
     coronaLor_model = CoronaLourenco()
-    # solve_ode(sir_model, time_point_samples, outpath = 'output/output_ode_sir.pdf')  # not implemented
+    solve_ode(coronaLor_model, time_point_samples, outpath = 'output/output_ode_Lor.pdf')  # not implemented
     df = simulate(nx.complete_graph(100), coronaLor_model, np.linspace(0, 50.0, 100), outpath='output/output_coronaLor_model_complete.pdf', num_runs=100)
     print('final mean CL complete:', final_mean(df, coronaLor_model))
 
