@@ -330,7 +330,7 @@ if __name__ == "__main__":
     # Create Gif with Corona Model on fuzzy geom model
     #
     # Note that visualization is super slow currently
-    deg = [1.0 if d == 4 else 0.0 for d in range(101)]
+    deg = [4 for _ in range(100)]
     G_geom, node_pos = fuzzy_geom_graph(100, .07 / 1.69, deg)
     if 'TRAVIS' not in os.environ:  # dont test this on travis
         visualization(G_geom, CoronaHill(init_exposed=[0], scale_by_mean_degree=False), np.linspace(0, 120, 60),

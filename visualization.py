@@ -44,7 +44,7 @@ def fuzzy_geom_graph(size, radius, deg, ret_coords=True, force_connected=True):
         adj |= adj.T
 
         G = nx.from_numpy_array(adj)
-        if nx.is_connected(G) or not force_connected:
+        if not force_connected or nx.is_connected(G):
             return G, coords.T
 
 
