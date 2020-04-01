@@ -21,7 +21,7 @@ from scipy.linalg import expm
 import heapq
 import copy
 from visualization import viz_simulate
-from generate_random_graphs import geom_graph, fuzzy_geom_graph, power_law_graph
+from generate_random_graphs import geom_graph, fuzzy_geom_graph, power_law_graph, geometric_configuration_model
 from tqdm import tqdm
 
 #
@@ -257,7 +257,7 @@ if __name__ == "__main__":
     #
     coronaLor_model = CoronaLourenco()
     solve_ode(coronaLor_model, time_point_samples, outpath = 'output/output_ode_Lor.pdf')  # not implemented
-    df = simulate(nx.complete_graph(100), coronaLor_model, time_point_samples, outpath='output/output_coronaLor_model_complete.pdf', num_runs=100)
+    df = simulate(nx.complete_graph(100), coronaLor_model, time_point_samples, outpath='output/output_coronaLor_model_complete.pdf', num_runs=20)
     print('final mean CL complete:', final_mean(df, coronaLor_model))
 
     #
@@ -337,17 +337,18 @@ if __name__ == "__main__":
     # Note that visualization is super slow currently
     # To reduce gif size you might want to use "gifsicle -i output_simulation_movie.gif -O3 --colors 100 -o anim-opt.gif"
     os.system('mkdir output_gif/')
-    G_geom, node_pos = geom_graph()
+    degree_sequence = [4]*300
+    G_geom, node_pos = geometric_configuration_model(degree_sequence)
     if 'TRAVIS' not in os.environ:  # dont test this on travis
-        visualization(G_geom, CoronaHill(init_exposed=[0], scale_by_mean_degree=False), np.linspace(0, 120, 60),
-                      outpath='output_gif/output_singlerun_geom_viz.pdf', node_pos=node_pos)
+        visualization(G_geom, CoronaHill(init_exposed=[0], scale_by_mean_degree=False), np.linspace(0, 200, 50),
+                      outpath='output_gif/output_singlerun_geomconfig_viz.pdf', node_pos=node_pos)
 
 
     #
     # Create Gif with SIS Model on fuzzy geom model
     #
     # Note that visualization is super slow currently
-    deg = [5 for _ in range(300)]
+    deg = [4 for _ in range(300)]
     G_geom, node_pos = fuzzy_geom_graph(300, 0.1, deg)
     if 'TRAVIS' not in os.environ:  # dont test this on travis
         visualization(G_geom, SISmodel(infection_rate=0.4), np.linspace(0, 5, 60),
