@@ -257,15 +257,23 @@ if __name__ == "__main__":
     #
     coronaLor_model = CoronaLourenco()
     solve_ode(coronaLor_model, time_point_samples, outpath = 'output/output_ode_Lor.pdf')  # not implemented
-    df = simulate(nx.complete_graph(100), coronaLor_model, np.linspace(0, 50.0, 100), outpath='output/output_coronaLor_model_complete.pdf', num_runs=100)
+    df = simulate(nx.complete_graph(100), coronaLor_model, time_point_samples, outpath='output/output_coronaLor_model_complete.pdf', num_runs=100)
     print('final mean CL complete:', final_mean(df, coronaLor_model))
 
     #
     # Test Corona-Lourenco Model on Power-law graph
     #
     coronaLor_model = CoronaLourenco()
-    G, _ = power_law_graph(100)
-    df = simulate(G, coronaLor_model, np.linspace(0, 50.0, 100), outpath='output/output_coronaLor_model_powerlaw.pdf', num_runs=100)
+    G, _ = power_law_graph(1000)
+    df = simulate(G, coronaLor_model, time_point_samples, outpath='output/output_coronaLor_model_powerlaw.pdf', num_runs=20)
+    print('final mean CL power law:', final_mean(df, coronaLor_model))
+
+    #
+    # Test Corona-Lourenco Model on Power-law graph with max truncate
+    #
+    coronaLor_model = CoronaLourenco()
+    G, _ = power_law_graph(1000, max_truncate=7)
+    df = simulate(G, coronaLor_model, time_point_samples, outpath='output/output_coronaLor_model_powerlaw_maxtrnct.pdf', num_runs=20)
     print('final mean CL power law:', final_mean(df, coronaLor_model))
 
     #

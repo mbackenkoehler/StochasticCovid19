@@ -53,9 +53,13 @@ def fuzzy_geom_graph(size, radius, deg, ret_coords=True, force_connected=True):
     print('failed graph generation')
 
 # seed does not really work
-def power_law_graph(num_nodes=100, gamma=2.2, min_truncate=2, seed = 42):
+def power_law_graph(num_nodes=100, gamma=2.2, min_truncate=2, max_truncate = None, seed = 42):
     degree_distribution = [0]+[(k+1)**(-gamma) for k in range(num_nodes)]
     degree_distribution[:min_truncate] = [0.0]*min_truncate
+    if max_truncate is not None:
+        # max truncate and everything larger is zero
+        degree_distribution[max_truncate:] = [0.0] * (len(degree_distribution)-max_truncate)
+    assert(len(degree_distribution) == num_nodes+1)
     z = np.sum(degree_distribution)
     degree_distribution = [p/z for p in degree_distribution]
     while True:
@@ -69,8 +73,11 @@ def power_law_graph(num_nodes=100, gamma=2.2, min_truncate=2, seed = 42):
 
     for seed in range(10000):
         seed += 42
-        contact_network = nx.configuration_model(degee_sequence)
-        self_loops = list(contact_network.selfloop_edges())
-        contact_network.remove_edges_from(self_loops)
+        contact_network = nx.configuration_model(degee_sequence, create_using=nx.Graph)
+        for n in contact_network.nodes():
+            try:
+                contact_network.remove_edge(n, n)  # hack, how to remove self-loops in nx 2.4??
+            except:
+                pass
         if nx.is_connected(contact_network):
             return contact_network, None

@@ -184,8 +184,6 @@ class CoronaHill(SpreadingModel):
 
         self.number_of_units = number_of_units  # only relevant for deterministic ODE
 
-    x = 3
-
     def states(self):
         return ['S', 'E', 'I1', 'I2', 'I3', 'R', 'D']
 
@@ -379,3 +377,96 @@ class CoronaLourenco(SpreadingModel):
         grad = [i_grad, s_grad, r_grad]
 
         return grad
+
+
+class CoronaBase(SpreadingModel):
+    def __init__(self, scale_by_mean_degree=True, number_of_units=1):
+
+        self.s_to_e_dueto_im = 0.5
+        self.s_to_e_dueto_imq = 0.1
+        self.s_to_e_dueto_is = 0.5
+        self.s_to_e_dueto_isq = 0.1
+        self.s_to_e_dueto_ish = 0.05
+
+        self.e_to_im = 0.2 * 4 / 5
+        self.e_to_is = 0.2 * 1 / 5
+
+        self.im_to_imq = 1
+        self.im_to_r = 1 / 5
+
+        self.imq_to_r = 1 / 5
+
+        self.is_to_isq = 1 / 2
+        self.is_to_ish = 1 / 4
+        self.is_to_r = 1 / 7
+        self.is_to_d = 1 / 14
+
+        self.isq_to_ish = 1 / 2
+        self.isq_to_r = 1 / 7
+        self.isq_to_d = 1 / 7
+
+        self.number_of_units = number_of_units
+        self.scale_by_mean_degree = scale_by_mean_degree
+
+    def markov_fireing(self, state_to_rate):
+        state_rate = list(state_to_rate.items())
+        state_firetime = [(s, -np.log(random.random()) / r) for s, r in state_rate]
+        state_firetime = sorted(state_firetime, key=lambda s_t: s_t[1])
+        min_state = state_firetime[0][0]
+        min_time = state_firetime[0][1]
+        return min_state, min_time
+
+    def states(self):
+        return ['S', 'E', 'Im', 'Imq', 'Is', 'Isq', 'Ish', 'R', 'D']
+
+    def generate_event(self, G, src_node, global_clock):
+        local_state = G.nodes[src_node]['state']
+
+        if local_state == 'S':
+            new_state = 'E'
+            neighbors = G.neighbors(src_node)
+            count_im = len([n for n in neighbors if G.nodes[n]['state'] == 'Im'])
+            count_imq = len([n for n in neighbors if G.nodes[n]['state'] == 'Imq'])
+            count_is = len([n for n in neighbors if G.nodes[n]['state'] == 'Is'])
+            count_isq = len([n for n in neighbors if G.nodes[n]['state'] == 'Isq'])
+            count_ish = len([n for n in neighbors if G.nodes[n]['state'] == 'Ish'])
+
+            if count_im + count_imq + count_is + count_isq + count_ish == 0:
+                fire_time = 10000000 + random.random()
+            else:
+                node_rate = count_im * self.s_to_e_dueto_im + count_imq * self.s_to_e_dueto_imq + count_is * self.s_to_e_dueto_is + count_isq * self.s_to_e_dueto_isq + count_ish * self.s_to_e_dueto_ish
+                if self.scale_by_mean_degree:
+                    mean_degree = (2 * len(G.edges())) / G.number_of_nodes()
+                    node_rate /= mean_degree
+                fire_time = -np.log(random.random()) / node_rate
+
+        elif local_state == 'E':
+            state_to_rate = {'Im': self.e_to_im, 'Is': self.e_to_is}
+            new_state, fire_time = self.markov_fireing(state_to_rate)
+
+        elif local_state == 'Im':
+            state_to_rate = {'Imq': self.im_to_imq, 'R': self.im_to_r}
+            new_state, fire_time = self.markov_fireing(state_to_rate)
+
+        elif local_state == 'Imq':
+            fire_time = -np.log(random.random()) / self.imq_to_r
+            new_state = 'R'
+
+        elif local_state == 'Is':
+            state_to_rate = {'Isq': self.is_to_isq, 'Ish': self.is_to_ish, 'R': self.is_to_r, 'D': self.is_to_d}
+            new_state, fire_time = self.markov_fireing(state_to_rate)
+
+        elif local_state == 'Isq':
+            state_to_rate = {'Ish': self.isq_to_ish, 'R': self.isq_to_r, 'D': self.isq_to_d}
+            new_state, fire_time = self.markov_fireing(state_to_rate)
+
+        elif local_state == 'Ish':
+            state_to_rate = {'R': self.ish_to_r, 'D': self.ish_to_d}
+            new_state, fire_time = self.markov_fireing(state_to_rate)
+
+        else:
+            new_state = local_state
+            fire_time = 1000000 + random.random()
+
+        new_time = global_clock + fire_time
+        return new_time, new_state
