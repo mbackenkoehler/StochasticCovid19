@@ -408,7 +408,7 @@ class CoronaBase(SpreadingModel):
         self.number_of_units = number_of_units
         self.scale_by_mean_degree = scale_by_mean_degree
 
-    def markov_fireing(self, state_to_rate):
+    def markov_firing(self, state_to_rate):
         state_rate = list(state_to_rate.items())
         state_firetime = [(s, -np.log(random.random()) / r) for s, r in state_rate]
         state_firetime = sorted(state_firetime, key=lambda s_t: s_t[1])
@@ -442,11 +442,11 @@ class CoronaBase(SpreadingModel):
 
         elif local_state == 'E':
             state_to_rate = {'Im': self.e_to_im, 'Is': self.e_to_is}
-            new_state, fire_time = self.markov_fireing(state_to_rate)
+            new_state, fire_time = self.markov_firing(state_to_rate)
 
         elif local_state == 'Im':
             state_to_rate = {'Imq': self.im_to_imq, 'R': self.im_to_r}
-            new_state, fire_time = self.markov_fireing(state_to_rate)
+            new_state, fire_time = self.markov_firing(state_to_rate)
 
         elif local_state == 'Imq':
             fire_time = -np.log(random.random()) / self.imq_to_r
@@ -454,15 +454,15 @@ class CoronaBase(SpreadingModel):
 
         elif local_state == 'Is':
             state_to_rate = {'Isq': self.is_to_isq, 'Ish': self.is_to_ish, 'R': self.is_to_r, 'D': self.is_to_d}
-            new_state, fire_time = self.markov_fireing(state_to_rate)
+            new_state, fire_time = self.markov_firing(state_to_rate)
 
         elif local_state == 'Isq':
             state_to_rate = {'Ish': self.isq_to_ish, 'R': self.isq_to_r, 'D': self.isq_to_d}
-            new_state, fire_time = self.markov_fireing(state_to_rate)
+            new_state, fire_time = self.markov_firing(state_to_rate)
 
         elif local_state == 'Ish':
             state_to_rate = {'R': self.ish_to_r, 'D': self.ish_to_d}
-            new_state, fire_time = self.markov_fireing(state_to_rate)
+            new_state, fire_time = self.markov_firing(state_to_rate)
 
         else:
             new_state = local_state

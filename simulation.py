@@ -50,7 +50,7 @@ def get_critical_value(contact_network):
     return beta
 
 
-def simulation_run(G, model, time_point_samples, at_leat_one=False, max_steps=None, node_wise_matrix=None,
+def simulation_run(G, model, time_point_samples, at_least_one=False, max_steps=None, node_wise_matrix=None,
                    interventions=None):
     global_clock = 0.0
     step_i = 0
@@ -114,7 +114,7 @@ def simulation_run(G, model, time_point_samples, at_leat_one=False, max_steps=No
             e = model.next_event(G, src_node, global_clock)
             heapq.heappush(event_queue, e)
             continue
-        if at_leat_one and 'I' in model.states() and node_counter['I'] == 1:
+        if at_least_one and 'I' in model.states() and node_counter['I'] == 1:
             e = model.next_event(G, src_node, global_clock)
             heapq.heappush(event_queue, e)
             continue
@@ -165,7 +165,7 @@ def simulate(G, model, time_point_samples, num_runs=None, outpath='output/output
     for run_i in range(num_runs):
         G_run_i = copy.deepcopy(G)  # to not overwrite
 
-        node_state_counts = simulation_run(G_run_i, model, time_point_samples, at_leat_one=False, max_steps=max_steps,
+        node_state_counts = simulation_run(G_run_i, model, time_point_samples, at_least_one=False, max_steps=max_steps,
                                            node_wise_matrix=node_wise_matrix, interventions=interventions)
 
         try:
