@@ -33,9 +33,52 @@ class Intervention:
 
 
 ########################################################
-# Test Intervention
+# Source Tracing for Hill model
 ########################################################
 
+class HillSourceTracing(Intervention):
+    """
+    A simple source tracing for the `CoronaHill` model. This is to be used in
+    conjunction with the `CoronaHillWSourceTracing` model. A contact of a
+    quarantined individual `I1Q`, `I2Q`, or `I3Q` is quarantined for a fixed
+    amount of time (a `Q` is appended to its state)
+    """
+
+    def __init__(self, contact_detection_prob):
+        assert 0 <= contact_detection_prob <= 1
+        self.contact_detection_prob = contact_detection_prob
+        # a list to track nodes that caused intervention
+        self.interventions_done = list()
+
+    def perform_intervention(self, G, model, last_event, global_clock, time_point_samples, event_queue, node_counter):
+        if last_event is None:
+            # TODO lift quarantine
+            return
+
+        # destruct event
+        src_node, new_state, event_id = event_content
+        if event_type != 'model':
+            return
+        new_time, event_type, event_content = current_event
+
+        if not new_state.endswith("Q"):
+            return
+
+        # check if the intervention was performed already for this node
+        if src_node in interventions_done:
+            return
+        interventions_done.append(src_node)
+
+        for neighbor in G.neighbors(src_node):
+            if np.random.rand() < self.contact_detection_prob:
+                neighbor_state = G.nodes[neighbor]['state']
+                if not neighbor_state.endswith('Q') or neighbor_state == 'D':
+                    G.nodes[neighbor]['state'] = neighbor_state.append('Q')
+
+
+########################################################
+# Test Intervention
+########################################################
 
 class RandomRecover(Intervention):
     def perform_intervention(self, G, model, last_event, global_clock, time_point_samples, event_queue, node_counter):

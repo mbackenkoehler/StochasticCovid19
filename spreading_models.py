@@ -312,10 +312,11 @@ class CoronaHill(SpreadingModel):
 
         return grad
 
-
+########################################################
 # Model by José Lourenço et al.
 # (not tested, no deads yet)
 # Oxford model: https://www.medrxiv.org/content/10.1101/2020.03.24.20042291v1.full.pdf
+########################################################
 class CoronaLourenco(SpreadingModel):
     def __init__(self, scale_by_mean_degree=True, number_of_units=1):
 
@@ -470,3 +471,214 @@ class CoronaBase(SpreadingModel):
 
         new_time = global_clock + fire_time
         return new_time, new_state
+
+
+########################################################
+# Corona Model (inspired by Alison Hill)
+########################################################
+
+class CoronaHillWSourceTracing(SpreadingModel):
+    # find the excellent online tool at: https://alhill.shinyapps.io/COVID19seir/
+    # conversion to a networked model based on scaling infection rate based on the mean degree of the network
+
+    def __init__(self, scale_by_mean_degree=True, init_exposed=None, number_of_units=1, scale_inf_rate=1):
+
+        b1 = 0.500  # / number of nodes      # infection rate from i1
+        b2 = 0.100  # / number of nodes      # infection rate from i2
+        b3 = 0.100  # / number of nodes      # infection rate from i3
+        a = 0.200  # e to i1
+        g1 = 0.133  # i1 to r
+        g2 = 0.125  # i2 to r
+        g3 = 0.075  # i3 to r
+        p1 = 0.033  # i1 to i2
+        p2 = 0.042  # i2 to i3
+        u = 0.050  # i3 to death
+
+        # quarantine rates
+        q1 = 1.0 # i1 to i1q
+        q2 = 1.0 # i2 to i2q
+        q3 = 1.0 # i3 to i3q
+
+        self.s_to_e_dueto_i1 = b1 * scale_inf_rate
+        self.s_to_e_dueto_i2 = b2 * scale_inf_rate
+        self.s_to_e_dueto_i3 = b3 * scale_inf_rate
+        self.e_to_i1 = a
+        self.i1_to_i2 = p1
+        self.i2_to_i3 = p2
+        self.i3_to_d = u
+        self.i1_to_r = g1
+        self.i2_to_r = g2
+        self.i3_to_r = g3
+        self.i1_to_i1q = q1
+        self.i2_to_i2q = q2
+        self.i3_to_i3q = q3
+        self.scale_by_mean_degree = scale_by_mean_degree
+        self.init_exposed = init_exposed
+
+        self.number_of_units = number_of_units  # only relevant for deterministic ODE
+
+    def states(self):
+        return ['S', 'E', 'SQ', 'EQ', 'I1', 'I2', 'I3', 'I1Q', 'I2Q', 'I3Q', 'R', 'D']
+
+    def colors(self):
+        colors = {'S': sns.xkcd_rgb['denim blue'], 'E': sns.xkcd_rgb['bright orange'], 'I1': sns.xkcd_rgb['light red'],
+                  'I2': sns.xkcd_rgb['pinkish red'], 'I3': sns.xkcd_rgb['deep pink'], 'R': sns.xkcd_rgb['medium green'],
+                  'D': sns.xkcd_rgb['black']}
+        colors['I_total'] = 'gray'  # need to add states from finalize
+        return colors
+
+    def get_init_labeling(self, G):
+        if self.init_exposed is not None:
+            init_node_state = {n: 'S' for n in range(G.number_of_nodes())}
+            for exp_node in self.init_exposed:
+                init_node_state[exp_node] = 'E'
+            return init_node_state
+        init_node_state = {n: ('E' if random.random() > 0.90 else 'S') for n in range(G.number_of_nodes())}
+        return init_node_state
+
+    def aggregate(self, node_state_counts):
+        node_state_counts['I_total'] = [0 for _ in range(len(node_state_counts['I1']))]
+        for i, v in enumerate(node_state_counts['I1']):
+            node_state_counts['I_total'][i] += v
+        for i, v in enumerate(node_state_counts['I2']):
+            node_state_counts['I_total'][i] += v
+        for i, v in enumerate(node_state_counts['I3']):
+            node_state_counts['I_total'][i] += v
+        return node_state_counts
+
+    def generate_event(self, G, src_node, global_clock):
+        if G.nodes[src_node]['state'] == 'S':
+            new_state = 'E'
+            neighbors = G.neighbors(src_node)
+            count_i1 = len([n for n in neighbors if G.nodes[n]['state'] == 'I1'])
+            count_i2 = len([n for n in neighbors if G.nodes[n]['state'] == 'I2'])
+            count_i3 = len([n for n in neighbors if G.nodes[n]['state'] == 'I3'])
+            if count_i1 + count_i2 + count_i3 == 0:
+                fire_time = 10000000 + random.random()
+            else:
+                node_rate = count_i1 * self.s_to_e_dueto_i1 + count_i2 * self.s_to_e_dueto_i2 + count_i3 * self.s_to_e_dueto_i3
+                if self.scale_by_mean_degree:
+                    mean_degree = (2 * len(G.edges())) / G.number_of_nodes()
+                    node_rate /= mean_degree
+                fire_time = -np.log(random.random()) / node_rate
+
+        elif G.nodes[src_node]['state'] == 'E':
+            new_state = 'I1'
+            fire_time = -np.log(random.random()) / self.e_to_i1
+
+        elif G.nodes[src_node]['state'] == 'I1':
+            u1, u2 = np.random.rand(2)
+            rate0 = self.i1_to_i2 + self.i1_to_r + self.i1_to_i1q
+            fire_time = -np.log(u1) / rate0
+            u2 *= rate0
+            if u2 < self.i1_to_i2:
+                new_state = 'I2'
+            elif u2 < self.i1_to_i2 + self.i1_to_r:
+                new_state = 'R'
+            else:
+                new_state = 'I1Q'
+
+        elif G.nodes[src_node]['state'] == 'I2':
+            u1, u2 = np.random.rand(2)
+            rate0 = self.i2_to_i3 + self.i2_to_r + self.i2_to_i2q
+            fire_time = -np.log(u1) / rate0
+            u2 *= rate0
+            if u2 < self.i2_to_i3:
+                new_state = 'I3'
+            elif u2 < self.i2_to_i3 + self.i2_to_r:
+                new_state = 'R'
+            else:
+                new_state = 'I2Q'
+
+        elif G.nodes[src_node]['state'] == 'I3':
+            u1, u2 = np.random.rand(2)
+            rate0 = self.i3_to_d + self.i3_to_r + self.i3_to_i3q
+            fire_time = -np.log(u1) / rate0
+            u2 *= rate0
+            if u2 < self.i3_to_d:
+                new_state = 'D'
+            elif u2 < self.i3_to_d + self.i3_to_r:
+                new_state = 'R'
+            else:
+                new_state = 'I3Q'
+
+        elif G.nodes[src_node]['state'] == 'I1Q':
+            new_state_c1 = 'I2Q'
+            fire_time_c1 = -np.log(random.random()) / self.i1_to_i2
+            new_state_c2 = 'R'
+            fire_time_c2 = -np.log(random.random()) / self.i1_to_r
+            if fire_time_c1 < fire_time_c2:
+                new_state = new_state_c1
+                fire_time = fire_time_c1
+            else:
+                new_state = new_state_c2
+                fire_time = fire_time_c2
+
+        elif G.nodes[src_node]['state'] == 'I2Q':
+            new_state_c1 = 'I3Q'
+            fire_time_c1 = -np.log(random.random()) / self.i2_to_i3
+            new_state_c2 = 'R'
+            fire_time_c2 = -np.log(random.random()) / self.i2_to_r
+            if fire_time_c1 < fire_time_c2:
+                new_state = new_state_c1
+                fire_time = fire_time_c1
+            else:
+                new_state = new_state_c2
+                fire_time = fire_time_c2
+
+        elif G.nodes[src_node]['state'] == 'I3Q':
+            new_state_c1 = 'D'
+            fire_time_c1 = -np.log(random.random()) / self.i3_to_d
+            new_state_c2 = 'R'
+            fire_time_c2 = -np.log(random.random()) / self.i3_to_r
+            if fire_time_c1 < fire_time_c2:
+                new_state = new_state_c1
+                fire_time = fire_time_c1
+            else:
+                new_state = new_state_c2
+                fire_time = fire_time_c2
+
+        elif G.nodes[src_node]['state'] == 'R':
+            new_state = 'R'
+            fire_time = 10000000 + random.random()
+        elif G.nodes[src_node]['state'] == 'D':
+            new_state = 'D'
+            fire_time = 10000000 + random.random()
+        else:
+            print('no matching state')
+            assert (False)
+
+        new_time = global_clock + fire_time
+        return new_time, new_state
+
+    # ODE
+
+    # has to be a vector in the order of models.states()
+    def ode_init(self):
+        init = [0.95, 0.05, 0.0, 0.0, 0.0, 0.0, 0.0]
+        init = [x * self.number_of_units for x in init]
+        return init
+
+    def ode_func(self, population_vector, t):
+        s = population_vector[0]
+        e = population_vector[1]
+        i1 = population_vector[2]
+        i2 = population_vector[3]
+        i3 = population_vector[4]
+        r = population_vector[5]
+        d = population_vector[6]
+
+        s_grad = -(
+                self.s_to_e_dueto_i1 / self.number_of_units * i1 + self.s_to_e_dueto_i2 / self.number_of_units * i3 + self.s_to_e_dueto_i3 / self.number_of_units * i3) * s
+        e_grad = (
+                         self.s_to_e_dueto_i1 / self.number_of_units * i1 + self.s_to_e_dueto_i2 / self.number_of_units * i3 + self.s_to_e_dueto_i3 / self.number_of_units * i3) * s - self.e_to_i1 * e
+        i1_grad = self.e_to_i1 * e - (self.i1_to_r + self.i1_to_i2) * i1
+        i2_grad = self.i1_to_i2 * i1 - (self.i2_to_r + self.i2_to_i3) * i2
+        i3_grad = self.i2_to_i3 * i2 - (self.i3_to_r + self.i3_to_d) * i3
+        r_grad = self.i1_to_r * i1 + self.i2_to_r * i2 + self.i3_to_r * i3
+        d_grad = self.i3_to_d * i3
+
+        grad = [s_grad, e_grad, i1_grad, i2_grad, i3_grad, r_grad, d_grad]
+
+        return grad
+
